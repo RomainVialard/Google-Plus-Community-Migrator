@@ -1,0 +1,19 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+    "enabledAdvancedServices": [{
+      "userSymbol": "Plus",
+      "serviceId": "plus",
+      "version": "v1"
+    }]
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/plus.me",
+    "https://www.googleapis.com/auth/plus.profile.emails.read",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/firebase.database"
+  ],
+  "exceptionLogging": "STACKDRIVER"
+}
+

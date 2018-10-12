@@ -1,0 +1,7 @@
+{
+  "name": "Google Apps Script community",
+  "short_name": "Apps Script community",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}

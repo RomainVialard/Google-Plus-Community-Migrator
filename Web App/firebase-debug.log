@@ -1,0 +1,75 @@
+[debug] [2018-10-12T09:24:12.284Z] ----------------------------------------------------------------------
+[debug] [2018-10-12T09:24:12.286Z] Command:       /usr/bin/node /usr/bin/firebase serve --only hosting
+[debug] [2018-10-12T09:24:12.286Z] CLI Version:   5.0.1
+[debug] [2018-10-12T09:24:12.286Z] Platform:      linux
+[debug] [2018-10-12T09:24:12.286Z] Node Version:  v8.12.0
+[debug] [2018-10-12T09:24:12.286Z] Time:          Fri Oct 12 2018 09:24:12 GMT+0000 (UTC)
+[debug] [2018-10-12T09:24:12.286Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-12T09:24:12.294Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-12T09:24:12.295Z] > authorizing via signed-in user
+[debug] [2018-10-12T09:24:12.295Z] [iam] checking project apps-script-community-archive for permissions ["firebase.projects.get"]
+[debug] [2018-10-12T09:24:12.297Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive:testIamPermissions  
+
+[debug] [2018-10-12T09:24:13.191Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-12T09:24:13.195Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive  
+ 
+[debug] [2018-10-12T09:24:14.023Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/home/romainvialard/WebstormProjects/community-migrator/Web app/web-start'...
+[info] 
+[debug] [2018-10-12T09:24:14.030Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/509854567540/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-12T09:24:14.632Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000
+[debug] [2018-10-12T09:44:07.535Z] ----------------------------------------------------------------------
+[debug] [2018-10-12T09:44:07.537Z] Command:       /usr/bin/node /usr/bin/firebase serve --only hosting
+[debug] [2018-10-12T09:44:07.537Z] CLI Version:   5.0.1
+[debug] [2018-10-12T09:44:07.537Z] Platform:      linux
+[debug] [2018-10-12T09:44:07.537Z] Node Version:  v8.12.0
+[debug] [2018-10-12T09:44:07.538Z] Time:          Fri Oct 12 2018 09:44:07 GMT+0000 (UTC)
+[debug] [2018-10-12T09:44:07.538Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-12T09:44:07.547Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-12T09:44:07.547Z] > authorizing via signed-in user
+[debug] [2018-10-12T09:44:07.547Z] [iam] checking project apps-script-community-archive for permissions ["firebase.projects.get"]
+[debug] [2018-10-12T09:44:07.549Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive:testIamPermissions  
+
+[debug] [2018-10-12T09:44:13.467Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-12T09:44:13.470Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive  
+ 
+[debug] [2018-10-12T09:44:14.250Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/home/romainvialard/WebstormProjects/community-migrator/Web app/web-start'...
+[info] 
+[debug] [2018-10-12T09:44:14.258Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/509854567540/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-12T09:44:14.784Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000
+[debug] [2018-10-12T10:07:08.178Z] ----------------------------------------------------------------------
+[debug] [2018-10-12T10:07:08.180Z] Command:       /usr/bin/node /usr/bin/firebase serve --only hosting
+[debug] [2018-10-12T10:07:08.180Z] CLI Version:   5.0.1
+[debug] [2018-10-12T10:07:08.181Z] Platform:      linux
+[debug] [2018-10-12T10:07:08.181Z] Node Version:  v8.12.0
+[debug] [2018-10-12T10:07:08.181Z] Time:          Fri Oct 12 2018 10:07:08 GMT+0000 (UTC)
+[debug] [2018-10-12T10:07:08.181Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-10-12T10:07:08.191Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-10-12T10:07:08.191Z] > authorizing via signed-in user
+[debug] [2018-10-12T10:07:08.191Z] [iam] checking project apps-script-community-archive for permissions ["firebase.projects.get"]
+[debug] [2018-10-12T10:07:08.193Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive:testIamPermissions  
+
+[debug] [2018-10-12T10:07:09.249Z] <<< HTTP RESPONSE 200
+[debug] [2018-10-12T10:07:09.253Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/apps-script-community-archive  
+ 
+[debug] [2018-10-12T10:07:10.201Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/home/romainvialard/WebstormProjects/community-migrator/Web app/web-start'...
+[info] 
+[debug] [2018-10-12T10:07:10.211Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/509854567540/clients/_:getWebAppConfig  
+ 
+[debug] [2018-10-12T10:07:10.813Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000

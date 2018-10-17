@@ -802,6 +802,8 @@ c-wiz>c-data {
 
 .jVjeQd {
   white-space: pre-wrap;
+  overflow: hidden; /*NEW*/
+  max-height: 200px; /*NEW*/
 }
 
 .R6Ozpf {

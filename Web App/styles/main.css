@@ -68,6 +68,7 @@ main, #posts-card {
 #posts {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 #post-filler {

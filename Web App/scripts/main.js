@@ -61,63 +61,6 @@ function loadPosts() {
   firebase.database().ref('/posts/').limitToLast(12).on('child_changed', callback);
 }
 
-// Saves a new message on the Firebase DB.
-function saveMessage(messageText) {
-  // TODO 8: Push a new message to Firebase.
-}
-
-// Saves a new message containing an image in Firebase.
-// This first saves the image in Firebase storage.
-function saveImageMessage(file) {
-  // TODO 9: Posts a new image as a message.
-}
-
-// Saves the messaging device token to the datastore.
-function saveMessagingDeviceToken() {
-  // TODO 10: Save the device token in the realtime datastore
-}
-
-// Requests permissions to show notifications.
-function requestNotificationsPermissions() {
-  // TODO 11: Request permissions to send notifications.
-}
-
-// Triggered when a file is selected via the media picker.
-function onMediaFileSelected(event) {
-  event.preventDefault();
-  var file = event.target.files[0];
-
-  // Clear the selection in the file picker input.
-  imageFormElement.reset();
-
-  // Check if the file is an image.
-  if (!file.type.match('image.*')) {
-    var data = {
-      message: 'You can only share images',
-      timeout: 2000
-    };
-    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
-    return;
-  }
-  // Check if the user is signed-in
-  if (checkSignedInWithMessage()) {
-    saveImageMessage(file);
-  }
-}
-
-// Triggered when the send new message form is submitted.
-function onMessageFormSubmit(e) {
-  e.preventDefault();
-  // Check that the user entered a message and is signed in.
-  if (messageInputElement.value && checkSignedInWithMessage()) {
-    saveMessage(messageInputElement.value).then(function() {
-      // Clear message text field and re-enable the SEND button.
-      resetMaterialTextfield(messageInputElement);
-      toggleButton();
-    });
-  }
-}
-
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
@@ -136,9 +79,6 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-
-    // We save the Firebase Messaging Device token and enable notifications.
-    saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
@@ -166,19 +106,136 @@ function checkSignedInWithMessage() {
   return false;
 }
 
-// Resets the given MaterialTextField.
-function resetMaterialTextfield(element) {
-  element.value = '';
-  element.parentNode.MaterialTextfield.boundUpdateClassesHandler();
-}
-
-// Template for messages.
-var MESSAGE_TEMPLATE =
-    '<div class="message-container">' +
-      '<div class="spacing"><div class="pic"></div></div>' +
-      '<div class="message"></div>' +
-      '<div class="name"></div>' +
-    '</div>';
+// Template for posts - copied from Google+ to match css classes
+var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-cell--5-col">'+
+  '    <div class="OisWG">'+
+  '        <div class="tpVlOc mEgM8 iCPjVb hE2QI">'+
+  '            <a href="./100918340617817280791" data-profileid="100918340617817280791"'+
+  '               class="h7vvy jfZVid" aria-hidden="true" tabindex="-1"><img class="MqU2J" height="36" width="36" src="" alt=""></a>'+
+  '            <div class="dVAtqc" id="author:c30">'+
+  '                <div class="q6HYG">'+
+  '                    <div class="mmkmJ"><a href="./100918340617817280791" data-profileid="100918340617817280791" class="sXku1c"></a></div>'+
+  '                    <div class="dNF4Ud pSkmb">'+
+  '                        <div class="XVzU0b pdkqBe tFHtob">'+
+  '                            <svg height="100%" width="100%">'+
+  '                                <path d="M20 14l10 10-10 10z"></path>'+
+  '                            </svg>'+
+  '                        </div>'+
+  '                        <div class="UohHvc">'+
+  '                            <a href="./communities/102471985047225101769" class="eYSPjc sRhiGb" aria-label="Google Apps Script community">Google Apps Script</a><a href="./communities/102471985047225101769/stream/9568169c-33a8-4215-a2a8-fc89fc456240" class="eYSPjc IJ13Ic" aria-label="Offtopic category">Offtopic</a>'+
+  '                            <div role="button" tabindex="0" data-oid="9568169c-33a8-4215-a2a8-fc89fc456240" class="ZTemg"'+
+  '                                 aria-label="Change category">'+
+  '                                <div class="XVzU0b g5imIb">'+
+  '                                    <svg height="100%" width="100%">'+
+  '                                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>'+
+  '                                    </svg>'+
+  '                                </div>'+
+  '                            </div>'+
+  '                        </div>'+
+  '                        <span class="HiU1rc" aria-hidden="true"></span>'+
+  '                    </div>'+
+  '                </div>'+
+  '                <div class="GmZGge">'+
+  '                    <div class="BIDenb">'+
+  '                        <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="eZ8gzf" aria-label="Full post view"><span class="DPvwYc rRPL7d" aria-hidden="true">?</span></a>'+
+  '                        <div class="LmajHd n8JNod">'+
+  '                            <div role="button" class="U26fgb JRtysb WzwrXb iRxCkb lrZTuc" aria-label="More options" aria-disabled="false" tabindex="0" aria-haspopup="true" aria-expanded="false" data-dynamic="true" data-alignright="true">'+
+  '                                <div class="NWlf3e MbhUzd"></div>'+
+  '                                <content class="MhXXcc oJeWuf"><span class="Lw7GHd snByac"><span class="DPvwYc NKEypf SnosMe" aria-hidden="true">?</span></span></content>'+
+  '                            </div>'+
+  '                        </div>'+
+  '                    </div>'+
+  '                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="o8gkze"><span aria-label=" 4 days">4d</span></a>'+
+  '                </div>'+
+  '            </div>'+
+  '        </div>'+
+  '        <span class="Sce4ed">'+
+  '               <div class="uVccjd t9tmff" data-checked-veid="46456" data-unchecked-veid="46457" aria-label="Select this post" tabindex="0" role="checkbox" aria-checked="false">'+
+  '                  <div class="PkgjBf MbhUzd"></div>'+
+  '                  <div class="uHMk6b fsHoPb"></div>'+
+  '                  <div class="rq8Mwb">'+
+  '                     <div class="TCA6qd">'+
+  '                        <div class="MbUTNc oyD5Oc"></div>'+
+  '                        <div class="Ii6cVc oyD5Oc"></div>'+
+  '                     </div>'+
+  '                  </div>'+
+  '               </div>'+
+  '            </span>'+
+  '    </div>'+
+  '    <div data-cai="c30" class="SlwI7e">'+
+  '        <div id="body:c30">'+
+  '            <div class="i8Zvz">'+
+  '                <div class="R6Ozpf qhIQqf">'+
+  '                    <div class="jVjeQd" dir="ltr">'+
+  '                </div>'+
+  '            </div>'+
+  '        </div>'+
+  '        <div class="i8Zvz"></div>'+
+  '    </div>'+
+  '    <div class="CKe11d" role="button" tabindex="0" aria-label="View comments">'+
+  '        <div aria-hidden="true">'+
+  '            <div class="EMg45"></div>'+
+  '        </div>'+
+  '    </div>'+
+  '    <div class="QeQGL">'+
+  '        <div data-fh="false" data-sc="true" class="SVDMFb VrClg">'+
+  '            <div class="pf7Psf kQxXGc tgi2ee" data-c="google-plus" data-si="14" data-av="true">'+
+  '                <content class="x2sGwe aRDqpc">'+
+  '                    <div>'+
+  '                        <div class="JPtOFc">'+
+  '                            <img class="WWCMIb vD3nIe" width="36" height="36" src="https://lh3.googleusercontent.com/-jCtTYPxmFpI/AAAAAAAAAAI/AAAAAAAATcY/nyORuSYZDqg/s72-p-k-rw-no-il/photo.jpg" alt="">'+
+  '                            <div class="QBU0S PnFuuf">'+
+  '                                <div class="L0Slxe" tabindex="0" role="button">Add a comment...</div>'+
+  '                            </div>'+
+  '                        </div>'+
+  '                    </div>'+
+  '                </content>'+
+  '                <div class="tb3unb" style="display:none;" aria-hidden="true">'+
+  '                    <div class="xn2mde gn1yRe">'+
+  '                        <img class="Xy5NZc n5wdGe" src="https://ssl.gstatic.com/social/plusappui/drag_drop_overlay_3ba422a8b93491a55b6fd8e5a6f5790d.png" aria-hidden="true">'+
+  '                        <div class="mlwXqe D5zEId">Drag photo here to add to your comment</div>'+
+  '                    </div>'+
+  '                </div>'+
+  '            </div>'+
+  '        </div>'+
+  '        <div class="b4FgKc xAPqUc" role="toolbar" aria-label="Post actions">'+
+  '            <div class="JzCzjd">'+
+  '                <div data-itemid="update/z12mjloprzmbxzlhm04cgjn4jsr5ipc4gc4" data-count="5" data-pressed="false" class="oHo9me">'+
+  '                    <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c teCjMb" aria-label="+1" aria-disabled="false" tabindex="0" aria-describedby="c31" aria-pressed="false">'+
+  '                        <div class="VTBa7b MbhUzd"></div>'+
+  '                        <content class="xjKiLb">'+
+  '                           <span style="top: -12px">'+
+  '                              <div class="G7pzvd">'+
+  '                                 <svg width="100%" height="100%">'+
+  '                                    <path class="Ce1Y1c" d="M10 8H8v4H4v2h4v4h2v-4h4v-2h-4zm4.5-1.92V7.9l2.5-.5V18h2V5z"></path>'+
+  '                                 </svg>'+
+  '                              </div>'+
+  '                           </span>'+
+  '                        </content>'+
+  '                    </div>'+
+  '                    <span class="cUjEhd" id="c31"> 5 plus ones</span>'+
+  '                </div>'+
+  '                <div class="M8ZOee" aria-hidden="true"> 5 </div>'+
+  '                <div class="oHo9me">'+
+  '                    <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c" aria-label="Share" aria-disabled="false" tabindex="0" aria-describedby="c32">'+
+  '                        <div class="VTBa7b MbhUzd"></div>'+
+  '                        <content class="xjKiLb">'+
+  '                           <span style="top: -12px">'+
+  '                              <div class="XVzU0b G7pzvd pdkqBe">'+
+  '                                 <svg height="100%" width="100%">'+
+  '                                    <path class="Ce1Y1c" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7 l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"></path>'+
+  '                                 </svg>'+
+  '                              </div>'+
+  '                           </span>'+
+  '                        </content>'+
+  '                    </div>'+
+  '                    <span class="cUjEhd" id="c32"> no shares</span>'+
+  '                </div>'+
+  '                <div class="M8ZOee" aria-hidden="true"></div>'+
+  '            </div>'+
+  '        </div>'+
+  '    </div>'+
+  '</div>';
 
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
@@ -189,43 +246,33 @@ function displayPost(key, name, text, picUrl, imageUrl) {
   // If an element for that message does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
-    container.innerHTML = MESSAGE_TEMPLATE;
+    container.innerHTML = POST_TEMPLATE;
     div = container.firstChild;
     div.setAttribute('id', key);
-    messageListElement.appendChild(div);
+    postListElement.appendChild(div);
   }
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + picUrl + ')';
+    div.querySelector('.MqU2J').src = picUrl;
   }
-  div.querySelector('.name').textContent = name;
-  var messageElement = div.querySelector('.message');
+  div.querySelector('.sXku1c').textContent = name;
+
+  var messageElement = div.querySelector('.jVjeQd');
   if (text) { // If the message is text.
-    messageElement.textContent = text;
-    // Replace all line breaks by <br>.
-    messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
-  } else if (imageUrl) { // If the message is an image.
+    messageElement.innerHTML = text;
+  }
+  else if (imageUrl) { // If the message is an image.
     var image = document.createElement('img');
     image.addEventListener('load', function() {
-      messageListElement.scrollTop = messageListElement.scrollHeight;
+      postListElement.scrollTop = postListElement.scrollHeight;
     });
     image.src = imageUrl + '&' + new Date().getTime();
     messageElement.innerHTML = '';
     messageElement.appendChild(image);
   }
+
   // Show the card fading-in and scroll to view the new message.
   setTimeout(function() {div.classList.add('visible')}, 1);
-  messageListElement.scrollTop = messageListElement.scrollHeight;
-  messageInputElement.focus();
-}
-
-// Enables or disables the submit button depending on the values of the input
-// fields.
-function toggleButton() {
-  if (messageInputElement.value) {
-    submitButtonElement.removeAttribute('disabled');
-  } else {
-    submitButtonElement.setAttribute('disabled', 'true');
-  }
+  postListElement.scrollTop = postListElement.scrollHeight;
 }
 
 // Checks that the Firebase SDK has been correctly setup and configured.
@@ -241,34 +288,15 @@ function checkSetup() {
 checkSetup();
 
 // Shortcuts to DOM Elements.
-var messageListElement = document.getElementById('messages');
-var messageFormElement = document.getElementById('message-form');
-var messageInputElement = document.getElementById('message');
-var submitButtonElement = document.getElementById('submit');
-var imageButtonElement = document.getElementById('submitImage');
-var imageFormElement = document.getElementById('image-form');
-var mediaCaptureElement = document.getElementById('mediaCapture');
+var postListElement = document.getElementById('posts');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
-// Saves message on form submit.
-messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
-
-// Toggle for the button.
-messageInputElement.addEventListener('keyup', toggleButton);
-messageInputElement.addEventListener('change', toggleButton);
-
-// Events for image upload.
-imageButtonElement.addEventListener('click', function(e) {
-  e.preventDefault();
-  mediaCaptureElement.click();
-});
-mediaCaptureElement.addEventListener('change', onMediaFileSelected);
 
 // initialize Firebase
 initFirebaseAuth();

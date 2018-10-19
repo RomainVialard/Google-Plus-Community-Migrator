@@ -456,10 +456,12 @@ c-wiz>c-data {
   display: block;
 }
 
+/*
 .IJ13Ic,
 .rjXqDe .sRhiGb {
   display: none;
 }
+*/
 
 .HiU1rc {
   color: #ff0000;
@@ -897,11 +899,13 @@ c-wiz>c-data {
   overflow: hidden;
 }
 
+/*
 .G7pzvd {
   height: 18px;
   width: 18px;
   margin: 2px;
 }
+*/
 
 .G7pzvd path {
   fill: #757575;

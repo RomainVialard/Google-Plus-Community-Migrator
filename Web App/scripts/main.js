@@ -53,12 +53,13 @@ function isUserSignedIn() {
 function loadPosts() {
   // Loads the last 12 posts and listen for new ones.
   var callback = function(snap) {
-    var data = snap.val();
-    displayPost(snap.key, data.actor.displayName, data.object.content, data.actor.image.url, data.imageUrl);
+    var postId = snap.key;
+    var postData = snap.val();
+    displayPost(postId, postData);
   };
 
-  firebase.database().ref('/posts/').limitToLast(12).on('child_added', callback);
-  firebase.database().ref('/posts/').limitToLast(12).on('child_changed', callback);
+  firebase.database().ref('/posts/').orderByChild('published').limitToLast(12).on('child_added', callback);
+  // firebase.database().ref('/posts/').limitToLast(12).on('child_changed', callback);
 }
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
@@ -110,11 +111,18 @@ function checkSignedInWithMessage() {
 var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-cell--5-col">'+
   '    <div class="OisWG">'+
   '        <div class="tpVlOc mEgM8 iCPjVb hE2QI">'+
-  '            <a href="./100918340617817280791" data-profileid="100918340617817280791"'+
-  '               class="h7vvy jfZVid" aria-hidden="true" tabindex="-1"><img class="MqU2J" height="36" width="36" src="" alt=""></a>'+
+
+  /* Post author profile picture - Replaced anchor on by span */
+  // '            <a href="./100918340617817280791" data-profileid="100918340617817280791" class="h7vvy jfZVid"><img class="MqU2J" height="36" width="36"></a>'+
+  '            <span class="h7vvy jfZVid"><img class="MqU2J" height="36" width="36"></span>'+
+
   '            <div class="dVAtqc" id="author:c30">'+
   '                <div class="q6HYG">'+
-  '                    <div class="mmkmJ"><a href="./100918340617817280791" data-profileid="100918340617817280791" class="sXku1c"></a></div>'+
+
+  /* Post author name - Replaced anchor on by span */
+  // '                    <div class="mmkmJ"><a href="./100918340617817280791" data-profileid="100918340617817280791" class="sXku1c"></a></div>'+
+  '                    <div class="mmkmJ"><span class="sXku1c"></span></div>'+
+
   '                    <div class="dNF4Ud pSkmb">'+
   '                        <div class="XVzU0b pdkqBe tFHtob">'+
   '                            <svg height="100%" width="100%">'+
@@ -122,7 +130,13 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                            </svg>'+
   '                        </div>'+
   '                        <div class="UohHvc">'+
-  '                            <a href="./communities/102471985047225101769" class="eYSPjc sRhiGb" aria-label="Google Apps Script community">Google Apps Script</a><a href="./communities/102471985047225101769/stream/9568169c-33a8-4215-a2a8-fc89fc456240" class="eYSPjc IJ13Ic" aria-label="Offtopic category">Offtopic</a>'+
+
+  // '                            <a href="./communities/102471985047225101769" class="eYSPjc sRhiGb" aria-label="Google Apps Script community">Google Apps Script</a>' +
+  /* Post category - Replaced anchor by span */
+  // '                            <a href="./communities/102471985047225101769/stream/9568169c-33a8-4215-a2a8-fc89fc456240" class="eYSPjc IJ13Ic"></a>' +
+  '                            <span class="eYSPjc IJ13Ic"></span>' +
+
+  /* Disable button to change post category
   '                            <div role="button" tabindex="0" data-oid="9568169c-33a8-4215-a2a8-fc89fc456240" class="ZTemg"'+
   '                                 aria-label="Change category">'+
   '                                <div class="XVzU0b g5imIb">'+
@@ -131,6 +145,8 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                                    </svg>'+
   '                                </div>'+
   '                            </div>'+
+  */
+
   '                        </div>'+
   '                        <span class="HiU1rc" aria-hidden="true"></span>'+
   '                    </div>'+
@@ -145,7 +161,7 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                            </div>'+
   '                        </div>'+
   '                    </div>'+
-  '                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="o8gkze"><span aria-label=" 4 days">4d</span></a>'+
+  '                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="o8gkze"><span></span></a>'+
   '                </div>'+
   '            </div>'+
   '        </div>'+
@@ -183,7 +199,7 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                <content class="x2sGwe aRDqpc">'+
   '                    <div>'+
   '                        <div class="JPtOFc">'+
-  '                            <img class="WWCMIb vD3nIe" width="36" height="36" src="https://lh3.googleusercontent.com/-jCtTYPxmFpI/AAAAAAAAAAI/AAAAAAAATcY/nyORuSYZDqg/s72-p-k-rw-no-il/photo.jpg" alt="">'+
+  '                            <img class="WWCMIb vD3nIe" width="36" height="36">'+
   '                            <div class="QBU0S PnFuuf">'+
   '                                <div class="L0Slxe" tabindex="0" role="button">Add a comment...</div>'+
   '                            </div>'+
@@ -205,7 +221,7 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                        <div class="VTBa7b MbhUzd"></div>'+
   '                        <content class="xjKiLb">'+
   '                           <span style="top: -12px">'+
-  '                              <div class="G7pzvd">'+
+  '                              <div class="G7pzvd" style="margin-left:3px">'+
   '                                 <svg width="100%" height="100%">'+
   '                                    <path class="Ce1Y1c" d="M10 8H8v4H4v2h4v4h2v-4h4v-2h-4zm4.5-1.92V7.9l2.5-.5V18h2V5z"></path>'+
   '                                 </svg>'+
@@ -215,7 +231,7 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                    </div>'+
   '                    <span class="cUjEhd" id="c31"> 5 plus ones</span>'+
   '                </div>'+
-  '                <div class="M8ZOee" aria-hidden="true"> 5 </div>'+
+  '                <div class="M8ZOee" aria-hidden="true"></div>'+
   '                <div class="oHo9me">'+
   '                    <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c" aria-label="Share" aria-disabled="false" tabindex="0" aria-describedby="c32">'+
   '                        <div class="VTBa7b MbhUzd"></div>'+
@@ -240,39 +256,35 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
 // A loading image URL.
 var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
-// Displays a Message in the UI.
-function displayPost(key, name, text, picUrl, imageUrl) {
-  var div = document.getElementById(key);
-  // If an element for that message does not exists yet we create it.
+// Displays a Post in the UI.
+function displayPost(postId, postData) {
+  var div = document.getElementById(postId);
+  // If an element for that post does not exists yet we create it.
   if (!div) {
     var container = document.createElement('div');
     container.innerHTML = POST_TEMPLATE;
     div = container.firstChild;
-    div.setAttribute('id', key);
-    postListElement.appendChild(div);
+    div.setAttribute('id', postId);
+    postListElement.insertBefore(div, postListElement.firstChild);
   }
-  if (picUrl) {
-    div.querySelector('.MqU2J').src = picUrl;
-  }
-  div.querySelector('.sXku1c').textContent = name;
+
+  div.querySelector('.MqU2J').src = postData.actor.image.url;
+  div.querySelector('.sXku1c').textContent = postData.actor.displayName;
+
+  var publicationDate = moment(postData.published);
+  div.querySelector('.o8gkze').textContent = publicationDate.fromNow();
+
+  var regExp = /\(([^)]+)\)/;
+  var category = regExp.exec(postData.access.description)[1];
+  div.querySelector('.IJ13Ic').textContent = category;
 
   var messageElement = div.querySelector('.jVjeQd');
-  if (text) { // If the message is text.
-    messageElement.innerHTML = text;
-  }
-  else if (imageUrl) { // If the message is an image.
-    var image = document.createElement('img');
-    image.addEventListener('load', function() {
-      postListElement.scrollTop = postListElement.scrollHeight;
-    });
-    image.src = imageUrl + '&' + new Date().getTime();
-    messageElement.innerHTML = '';
-    messageElement.appendChild(image);
-  }
+  messageElement.innerHTML = postData.object.content;
 
-  // Show the card fading-in and scroll to view the new message.
-  setTimeout(function() {div.classList.add('visible')}, 1);
-  postListElement.scrollTop = postListElement.scrollHeight;
+  div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;
+
+  // display the current user profile picture next to the comment UI
+  div.querySelector('.WWCMIb').src = firebase.auth().currentUser.photoURL;
 }
 
 // Checks that the Firebase SDK has been correctly setup and configured.

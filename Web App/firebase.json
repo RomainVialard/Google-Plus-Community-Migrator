@@ -5,7 +5,8 @@
       "firebase.json",
       "database-rules.json",
       "storage.rules",
-      "functions"
+      "functions",
+      "**/node_modules/**"
     ],
     "headers": [{
       "source" : "**/*.@(js|html)",

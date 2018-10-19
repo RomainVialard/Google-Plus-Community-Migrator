@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": false,
+
+    "posts": {
+      ".indexOn": ["published"]
+    }
+  }
+}

@@ -58,8 +58,8 @@ function loadPosts() {
     displayPost(postId, postData);
   };
 
-  firebase.database().ref('/posts/').orderByChild('published').limitToLast(12).on('child_added', callback);
-  // firebase.database().ref('/posts/').limitToLast(12).on('child_changed', callback);
+  firebase.database().ref('/posts/').orderByChild('published').limitToLast(100).on('child_added', callback);
+  // firebase.database().ref('/posts/').limitToLast(100).on('child_changed', callback);
 }
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.

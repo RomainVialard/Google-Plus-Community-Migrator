@@ -161,7 +161,11 @@ var POST_TEMPLATE = '<div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-
   '                            </div>'+
   '                        </div>'+
   '                    </div>'+
-  '                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="o8gkze"><span></span></a>'+
+
+  /* Publication date - Replaced anchor by span */
+  // '                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="o8gkze"><span></span></a>'+
+  '                    <span class="o8gkze"></span>'+
+
   '                </div>'+
   '            </div>'+
   '        </div>'+
@@ -282,6 +286,15 @@ function displayPost(postId, postData) {
   messageElement.innerHTML = postData.object.content;
 
   div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;
+  // Check if current user has +1 this post. In that case, make the +1 button red.
+  var path = '/plusoners/' + postId + '/' + firebase.auth().currentUser.providerData[0].uid + '/id';
+  firebase.database().ref(path).once('value').then(function(snapshot) {
+    if(snapshot.val()) {
+      var element = div.querySelector('[aria-label="+1"]');
+      element.classList.add('y7OZL');
+      element.classList.add('M9Bg4d');
+    }
+  });
 
   // display the current user profile picture next to the comment UI
   div.querySelector('.WWCMIb').src = firebase.auth().currentUser.photoURL;

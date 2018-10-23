@@ -10,3 +10,5 @@ Note that this is a demo / work in progress.
 Of course it is possible to simply move to another existing social network / online forum.
 But this demo shows that we can export all data from an existing community, to avoid losing it.
 Plus, by using Google authentication to log in this Firebase web app, each user is correctly recognized (your +1, comments,... are correctly attributed to you).
+
+

@@ -297,17 +297,21 @@ function displayPost(postId, postData) {
 
   div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;
   // Check if current user has +1 this post. In that case, make the +1 button red.
-  var path = '/plusoners/' + postId + '/' + firebase.auth().currentUser.providerData[0].uid + '/id';
-  firebase.database().ref(path).once('value').then(function(snapshot) {
-    if(snapshot.val()) {
-      var element = div.querySelector('[aria-label="+1"]');
-      element.classList.add('y7OZL');
-      element.classList.add('M9Bg4d');
-    }
-  });
+  var currentUser = firebase.auth().currentUser;
+  if (currentUser) {
+    var path = '/plusoners/' + postId + '/' + currentUser.providerData[0].uid + '/id';
+    firebase.database().ref(path).once('value').then(function(snapshot) {
+      if(snapshot.val()) {
+        var element = div.querySelector('[aria-label="+1"]');
+        element.classList.add('y7OZL');
+        element.classList.add('M9Bg4d');
+      }
+    });
 
-  // display the current user profile picture next to the comment UI
-  div.querySelector('.WWCMIb').src = firebase.auth().currentUser.photoURL;
+    // display the current user profile picture next to the comment UI
+    div.querySelector('.WWCMIb').src = currentUser.photoURL;
+  }
+
 }
 
 // Checks that the Firebase SDK has been correctly setup and configured.

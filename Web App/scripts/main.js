@@ -49,16 +49,23 @@ function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
 
-// Loads posts history and listens for upcoming ones.
+let referenceToOldestKey = '';
+
 function loadPosts() {
-  // Loads the last 12 posts and listen for new ones.
   var callback = function(snap) {
     var postId = snap.key;
     var postData = snap.val();
     displayPost(postId, postData);
+    if (!referenceToOldestKey || new Date(referenceToOldestKey).getTime() > new Date(postData.published).getTime()) {
+      referenceToOldestKey = postData.published;
+    }
   };
 
-  firebase.database().ref('/posts/').orderByChild('published').limitToLast(100).on('child_added', callback);
+  var query = firebase.database().ref('/posts/').orderByChild('published').limitToLast(10);
+  if (referenceToOldestKey) {
+    query = query.endAt(referenceToOldestKey);
+  }
+  query.on('child_added', callback);
   // firebase.database().ref('/posts/').limitToLast(100).on('child_changed', callback);
 }
 
@@ -269,7 +276,10 @@ function displayPost(postId, postData) {
     container.innerHTML = POST_TEMPLATE;
     div = container.firstChild;
     div.setAttribute('id', postId);
-    postListElement.insertBefore(div, postListElement.firstChild);
+
+    if (!referenceToOldestPost) postListElement.appendChild(div);
+    else postListElement.insertBefore(div, referenceToOldestPost);
+    referenceToOldestPost = div;
   }
 
   div.querySelector('.MqU2J').src = postData.actor.image.url;
@@ -319,6 +329,7 @@ var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var signInSnackbarElement = document.getElementById('must-signin-snackbar');
+let referenceToOldestPost = '';
 
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
@@ -326,5 +337,11 @@ signInButtonElement.addEventListener('click', signIn);
 // initialize Firebase
 initFirebaseAuth();
 
-// We load currently existing chat messages and listen to new ones.
 loadPosts();
+document.getElementsByTagName('main')[0].addEventListener('scroll', function(event) {
+  var element = event.target;
+  if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+    referenceToOldestPost = '';
+    loadPosts();
+  }
+});

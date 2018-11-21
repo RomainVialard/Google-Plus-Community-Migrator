@@ -2,13 +2,17 @@ function getAllPosts() {
   var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
   var communityId = "102471985047225101769";
   var maxNbOfPostsToRetrieve = 30;
+  var searchQuery = "community:" + communityId;
+  // you can use as the searchQuery most advanced search features listed here:
+  // https://support.google.com/plus/answer/1669519
+  // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
 
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
   var nextPageToken = null;
   var count = 0;
   do {
-    var activityFeed = Plus.Activities.search("community:" + communityId, {pageToken: nextPageToken});
+    var activityFeed = Plus.Activities.search(searchQuery, {pageToken: nextPageToken});
     nextPageToken = activityFeed.nextPageToken;
     var posts = activityFeed.items;
 

@@ -138,9 +138,10 @@ function displayPost(postId, postData) {
   var publicationDate = moment(postData.published);
   div.querySelector('.o8gkze').textContent = publicationDate.fromNow();
 
+  // check if the access.description field contains a community category
   var regExp = /\(([^)]+)\)/;
-  var category = regExp.exec(postData.access.description)[1];
-  div.querySelector('.IJ13Ic').textContent = category;
+  var category = regExp.exec(postData.access.description);
+  if (category) div.querySelector('.IJ13Ic').textContent = category[1];
 
   var messageElement = div.querySelector('.jVjeQd');
   messageElement.innerHTML = postData.object.content;

@@ -120,17 +120,17 @@ var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 // Displays a Post in the UI.
 function displayPost(postId, postData) {
   var div = document.getElementById(postId);
-  // If an element for that post does not exists yet we create it.
-  if (!div) {
-    var template = document.getElementById("posts").querySelector("template");
-    var copy = document.importNode(template.content, true);
-    div = copy.querySelector('div');
-    div.id = postId;
+  // if post was already retrieved and displayed, skip
+  if (div) return;
 
-    if (!referenceToOldestPost) postListElement.appendChild(div);
-    else postListElement.insertBefore(div, referenceToOldestPost);
-    referenceToOldestPost = div;
-  }
+  var template = document.getElementById("posts").querySelector("template");
+  var copy = document.importNode(template.content, true);
+  div = copy.querySelector('div');
+  div.id = postId;
+
+  if (!referenceToOldestPost) postListElement.appendChild(div);
+  else postListElement.insertBefore(div, referenceToOldestPost);
+  referenceToOldestPost = div;
 
   div.querySelector('.MqU2J').src = postData.actor.image.url;
   div.querySelector('.sXku1c').textContent = postData.actor.displayName;

@@ -816,6 +816,46 @@ c-wiz>c-data {
   overflow: hidden;
 }
 
+.R6Ozpf.qhIQqf {
+  line-height: 20px;
+  overflow: hidden;
+  max-height: 180px
+}
+
+.R6Ozpf.qhIQqf:before {
+  content: "";
+  float: left;
+  width: 5px;
+  height: 100%
+}
+
+.R6Ozpf.qhIQqf>.jVjeQd {
+  float: right;
+  width: 100%;
+  margin-left: -5px
+}
+
+.R6Ozpf.qhIQqf:after {
+  content: "\002026";
+  font-size: 34px;
+  font-weight: 500;
+  color: #4285f4;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  float: right;
+  position: relative;
+  top: 160px;
+  left: 100%;
+  height: 20px;
+  line-height: 4px;
+  width: 2em;
+  margin-left: -2em;
+  padding-right: 5px;
+  text-align: right;
+  background: linear-gradient(to right,rgba(255,255,255,0),white 50%,white);
+  cursor: pointer
+}
+
 .JRtysb {
   -webkit-user-select: none;
   -webkit-transition: background .3s;
@@ -972,4 +1012,54 @@ c-wiz>c-data {
   font-style: normal;
   font-weight: 400;
   src: url(//fonts.gstatic.com/s/materialiconsextended/v42/kJEjBvgX7BgnkSrUwT8UnLVc38YydejYY-oE_LvJ.woff2)format('woff2');
+}
+
+/* Comments */
+
+.CKe11d {
+  border-top: 1px solid #ebebeb;
+  height: 100%;
+  -webkit-transition: background-color 200ms ease-in;
+  transition: background-color 200ms ease-in
+}
+
+.CKe11d,.cDhoub:not(.iFJd6c) .QeQGL {
+  background-color: #fafafa
+}
+
+.EMg45:not(:empty) {
+  padding-bottom: 8px
+}
+
+.X865Z {
+    line-height: 18px;
+    margin: 16px 16px 0;
+    overflow: hidden;
+    word-break: break-word;
+    font-size: 13px
+}
+
+.X865Z .vGowKb {
+    font-size: 13px
+}
+
+.SVRkP {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    max-height: 36px
+}
+
+.vGowKb {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.87);
+    text-overflow: ellipsis;
+    overflow: hidden
+}
+
+.Wj5EM {
+    color: rgba(0,0,0,0.87)
 }

@@ -122,9 +122,9 @@ function displayPost(postId, postData) {
   var div = document.getElementById(postId);
   // If an element for that post does not exists yet we create it.
   if (!div) {
-    var template = document.querySelectorAll("template")[0];
+    var template = document.getElementById("posts").querySelector("template");
     var copy = document.importNode(template.content, true);
-    div = copy.querySelectorAll('div')[0];
+    div = copy.querySelector('div');
     div.id = postId;
 
     if (!referenceToOldestPost) postListElement.appendChild(div);
@@ -146,6 +146,7 @@ function displayPost(postId, postData) {
   var messageElement = div.querySelector('.jVjeQd');
   messageElement.innerHTML = postData.object.content;
 
+  // LIKES / PLUSONES
   div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;
   // Check if current user has +1 this post. In that case, make the +1 button red.
   var currentUser = firebase.auth().currentUser;
@@ -161,6 +162,29 @@ function displayPost(postId, postData) {
 
     // display the current user profile picture next to the comment UI
     div.querySelector('.WWCMIb').src = currentUser.photoURL;
+  }
+  else {
+    // if user not authenticated, hide profile picture placeholder + comment textbox
+    div.querySelector('.JPtOFc').style.display = 'none';
+  }
+
+  // COMMENTS
+  if (postData.object.replies.totalItems) {
+    var commentSection = div.querySelector('.EMg45');
+    var path = '/comments/' + postId;
+    var query = firebase.database().ref(path).orderByChild('published').limitToLast(3);
+    query.on('child_added', function (snapshot) {
+      if(snapshot.val()) {
+        var comment = snapshot.val();
+        var commentTemplate = commentSection.querySelector("template");
+        var copy = document.importNode(commentTemplate.content, true);
+        var div = copy.querySelector('div');
+        commentSection.appendChild(div);
+        console.log(comment);
+        div.querySelector('.vGowKb').textContent = comment.actor.displayName;
+        div.querySelector('.Wj5EM').querySelector('span').innerHTML = comment.object.content;
+      }
+    });
   }
 
 }
@@ -200,3 +224,8 @@ document.getElementsByTagName('main')[0].addEventListener('scroll', function(eve
     loadPosts();
   }
 });
+
+function expandPost(el) {
+  el.classList.remove("qhIQqf");
+  el.querySelector('.jVjeQd').style['max-height'] = 'none';
+}

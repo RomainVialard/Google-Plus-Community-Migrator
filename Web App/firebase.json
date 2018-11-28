@@ -8,7 +8,7 @@
       "firebase.json",
       "database-rules.json",
       "storage.rules",
-      "functios",
+      "functions",
       "**/node_modules/**"
     ],
     "headers": [{

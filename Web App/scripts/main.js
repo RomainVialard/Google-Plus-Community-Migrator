@@ -218,7 +218,7 @@ initFirebaseAuth();
 loadPosts();
 document.getElementsByTagName('main')[0].addEventListener('scroll', function(event) {
   var element = event.target;
-  if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+  if (Math.round(element.scrollHeight - element.scrollTop) === Math.round(element.clientHeight)) {
     referenceToOldestPost = '';
     loadPosts();
   }

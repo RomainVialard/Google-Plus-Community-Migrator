@@ -180,7 +180,6 @@ function displayPost(postId, postData) {
         var copy = document.importNode(commentTemplate.content, true);
         var div = copy.querySelector('div');
         commentSection.appendChild(div);
-        console.log(comment);
         div.querySelector('.vGowKb').textContent = comment.actor.displayName;
         div.querySelector('.Wj5EM').querySelector('span').innerHTML = comment.object.content;
       }

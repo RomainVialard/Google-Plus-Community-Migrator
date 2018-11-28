@@ -5,6 +5,12 @@
 
     "posts": {
       ".indexOn": ["published"]
+    },
+
+    "comments": {
+      "$post_id": {
+        ".indexOn": ["published"]
+      }
     }
   }
 }

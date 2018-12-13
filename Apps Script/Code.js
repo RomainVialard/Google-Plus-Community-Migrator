@@ -1,23 +1,42 @@
 function getAllPosts() {
   var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
   var communityId = "102471985047225101769";
-  var maxNbOfPostsToRetrieve = 30;
   var searchQuery = "community:" + communityId;
   // you can use as the searchQuery most advanced search features listed here:
   // https://support.google.com/plus/answer/1669519
   // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
 
+  var startTime = Date.now();
+  
+  var lock = LockService.getScriptLock();
+  // wait for 100ms only. If one instance of the script is already executing, abort.
+  var lockAcquired = lock.tryLock(100);
+  if (!lockAcquired) return;
+  
+  // Retrieving all the posts you want (eg: all posts from a specific community) might take quite a long time
+  // Best to create a time-driven trigger to split the work between multiple script executions
+  var triggers = ScriptApp.getProjectTriggers();
+  if (!triggers.length) {
+    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    console.log("Trigger created");
+  }
+  
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var properties = scriptProperties.getProperties();
+  var nextPageToken = properties["nextPageToken"] || null;
+  var nbOfPostsRetrieved = properties["nbOfPostsRetrieved"] || 0;
+  
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
-  var nextPageToken = null;
-  var count = 0;
+  
   do {
     var activityFeed = Plus.Activities.search(searchQuery, {pageToken: nextPageToken});
-    nextPageToken = activityFeed.nextPageToken;
     var posts = activityFeed.items;
+    nextPageToken = activityFeed.nextPageToken;
+    if (!posts.length) nextPageToken = null;
 
     for (var i in posts) {
-      count++;
+      nbOfPostsRetrieved++;
       var postId = posts[i].id;
       fb.setData("posts/" + postId, posts[i]);
 
@@ -53,7 +72,24 @@ function getAllPosts() {
           fb.setData("resharers/" + postId + "/" + reshareId, resharers[j]);
         }
       }
-      
     }
-  } while (nextPageToken && count < maxNbOfPostsToRetrieve);
+    
+    ErrorHandler.expBackoff(function(){
+      scriptProperties.setProperties({
+        'nextPageToken': nextPageToken,
+        'nbOfPostsRetrieved': nbOfPostsRetrieved
+      });
+    });
+    
+    console.log(nbOfPostsRetrieved + " posts retrieved so far");
+  
+    // stop if script run for more than 4 min (next trigger will process next batch)
+    // or if there's no more posts to retrieve (nextPageToken is null)
+  } while (Date.now() - startTime < 4 * 60 * 1000 && nextPageToken);
+  
+  if (!nextPageToken) {
+    var trigger = ScriptApp.getProjectTriggers()[0];
+    ScriptApp.deleteTrigger(trigger);
+    console.log("Trigger deleted");
+  }
 }

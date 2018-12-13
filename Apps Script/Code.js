@@ -15,6 +15,9 @@ function getAllPosts() {
   
   // Retrieving all the posts you want (eg: all posts from a specific community) might take quite a long time
   // Best to create a time-driven trigger to split the work between multiple script executions
+  // Note that Google enforces a limit of 10K calls per day to the G+ API, after that you will start seeing the error:
+  // "Daily Limit Exceeded. The quota will be reset at midnight Pacific Time (PT)."
+  // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (!triggers.length) {
     ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();

@@ -143,8 +143,15 @@ function displayPost(postId, postData) {
   var category = regExp.exec(postData.access.description);
   if (category) div.querySelector('.IJ13Ic').textContent = category[1];
 
+  // Display HTML content of the post
   var messageElement = div.querySelector('.jVjeQd');
   messageElement.innerHTML = postData.object.content;
+
+  // Check if an image is linked to the post
+  if (postData.object.attachments && postData.object.attachments['0'] && postData.object.attachments['0'].image) {
+    div.querySelector('div[data-jsname="MTOxpb"]').style.display = "block";
+    div.querySelector('.JZUAbb').src = postData.object.attachments['0'].image.url;
+  }
 
   // LIKES / PLUSONES
   div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;

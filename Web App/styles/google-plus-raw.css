@@ -1063,3 +1063,81 @@ c-wiz>c-data {
 .Wj5EM {
     color: rgba(0,0,0,0.87)
 }
+
+/* Images */
+
+.e8zLFb {
+  position: relative
+}
+
+.e8zLFb:not(.gAhgE):hover {
+  cursor: pointer
+}
+
+.e8zLFb.GSnotf {
+  padding: 12px 0 4px
+}
+
+.uvi9me {
+  position: relative;
+  margin: auto
+}
+
+.e8zLFb.GSnotf .uvi9me {
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0
+}
+
+.zUOARd {
+  outline: none;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 16px 16px;
+  color: #fff;
+  max-width: 100%;
+  position: absolute;
+  white-space: nowrap;
+  background-color: 0;
+  background-image: -webkit-linear-gradient(to top,rgba(0,0,0,.75),transparent);
+  background-image: linear-gradient(to top,rgba(0,0,0,.75),transparent)
+}
+
+.e8zLFb.GSnotf .zUOARd {
+  padding: 0 10px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px
+}
+
+.prbHAf {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 15px 0 5px 0;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.e8zLFb.GSnotf .prbHAf {
+  font-size: 14px
+}
+
+.E68jgf {
+  position: relative;
+  height: 0;
+  width: 100%;
+  overflow: hidden
+}
+
+.JZUAbb {
+  position: absolute;
+  display: block;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  margin: auto
+}

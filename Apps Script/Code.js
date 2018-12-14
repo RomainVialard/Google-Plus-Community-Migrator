@@ -47,10 +47,16 @@ function getAllPosts() {
       var comments = ErrorHandler.expBackoff(function(){
         return Plus.Comments.list(postId).items;
       });
-      if (comments && !(comments instanceof Error)) {
-        for (var j in comments) {
-          var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
-          fb.setData("comments/" + postId + "/" + commentId, comments[j]);
+      if (comments) {
+        if (comments instanceof Error) {
+          // Abort if no quota
+          if (comments.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
+        }
+        else {
+          for (var j in comments) {
+            var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
+            fb.setData("comments/" + postId + "/" + commentId, comments[j]);
+          }
         }
       }
 
@@ -58,10 +64,16 @@ function getAllPosts() {
       var plusoners = ErrorHandler.expBackoff(function(){
         return Plus.People.listByActivity(postId, "plusoners").items;
       });
-      if (plusoners && !(plusoners instanceof Error)) {
-        for (var j in plusoners) {
-          var plusoneId = plusoners[j].id;
-          fb.setData("plusoners/" + postId + "/" + plusoneId, plusoners[j]);
+      if (plusoners) {
+        if (plusoners instanceof Error) {
+          // Abort if no quota
+          if (plusoners.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
+        }
+        else {
+          for (var j in plusoners) {
+            var plusoneId = plusoners[j].id;
+            fb.setData("plusoners/" + postId + "/" + plusoneId, plusoners[j]);
+          }
         }
       }
       
@@ -69,10 +81,16 @@ function getAllPosts() {
       var resharers = ErrorHandler.expBackoff(function(){
         return Plus.People.listByActivity(postId, "resharers").items;
       });
-      if (resharers && !(resharers instanceof Error)) {
-        for (var j in resharers) {
-          var reshareId = resharers[j].id;
-          fb.setData("resharers/" + postId + "/" + reshareId, resharers[j]);
+      if (resharers) {
+        if (resharers instanceof Error) {
+          // Abort if no quota
+          if (resharers.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
+        }
+        else {
+          for (var j in resharers) {
+            var reshareId = resharers[j].id;
+            fb.setData("resharers/" + postId + "/" + reshareId, resharers[j]);
+          }
         }
       }
     }

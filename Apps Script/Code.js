@@ -6,12 +6,15 @@ function getAllPosts() {
   // https://support.google.com/plus/answer/1669519
   // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
 
+  var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   var startTime = Date.now();
   
   var lock = LockService.getScriptLock();
   // wait for 100ms only. If one instance of the script is already executing, abort.
   var lockAcquired = lock.tryLock(100);
   if (!lockAcquired) return;
+  
+  var scriptProperties = PropertiesService.getScriptProperties();
   
   // Retrieving all the posts you want (eg: all posts from a specific community) might take quite a long time
   // Best to create a time-driven trigger to split the work between multiple script executions
@@ -22,12 +25,23 @@ function getAllPosts() {
   if (!triggers.length) {
     ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
     console.log("Trigger created");
+    // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
+    scriptProperties.setProperty("lastSyncDate", today);
   }
   
-  var scriptProperties = PropertiesService.getScriptProperties();
   var properties = scriptProperties.getProperties();
   var nextPageToken = properties["nextPageToken"] || null;
   var nbOfPostsRetrieved = properties["nbOfPostsRetrieved"] || 0;
+  var lastSyncDate = properties["lastSyncDate"] || today;
+  var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
+  if (onlySyncNewPosts) {
+    // full export done, simply retrieve the latest posts
+    searchQuery+= "after: " + lastSyncDate;
+    if (!nextPageToken) {
+      // update lastSyncDate
+      scriptProperties.setProperty("lastSyncDate", today);
+    }
+  }
   
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
@@ -109,8 +123,7 @@ function getAllPosts() {
   } while (Date.now() - startTime < 4 * 60 * 1000 && nextPageToken);
   
   if (!nextPageToken) {
-    var trigger = ScriptApp.getProjectTriggers()[0];
-    ScriptApp.deleteTrigger(trigger);
-    console.log("Trigger deleted");
+    // Once the full export is done, keep syncing but only retrieve new posts
+    scriptProperties.setProperty("onlySyncNewPosts", true);
   }
 }

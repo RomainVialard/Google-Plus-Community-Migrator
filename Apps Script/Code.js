@@ -36,11 +36,7 @@ function getAllPosts() {
   var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
   if (onlySyncNewPosts) {
     // full export done, simply retrieve the latest posts
-    searchQuery+= "after: " + lastSyncDate;
-    if (!nextPageToken) {
-      // update lastSyncDate
-      scriptProperties.setProperty("lastSyncDate", today);
-    }
+    searchQuery+= " after:" + lastSyncDate;
   }
   
   var token = ScriptApp.getOAuthToken();
@@ -123,7 +119,13 @@ function getAllPosts() {
   } while (Date.now() - startTime < 4 * 60 * 1000 && nextPageToken);
   
   if (!nextPageToken) {
-    // Once the full export is done, keep syncing but only retrieve new posts
-    scriptProperties.setProperty("onlySyncNewPosts", true);
+    if (!onlySyncNewPosts) {
+      // Once the full export is done, keep syncing but only retrieve new posts
+      scriptProperties.setProperty("onlySyncNewPosts", true);
+    }
+    else {
+      // update lastSyncDate
+      scriptProperties.setProperty("lastSyncDate", today);
+    }
   }
 }

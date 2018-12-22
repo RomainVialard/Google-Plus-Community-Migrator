@@ -122,6 +122,19 @@ function getAllPosts() {
     if (!onlySyncNewPosts) {
       // Once the full export is done, keep syncing but only retrieve new posts
       scriptProperties.setProperty("onlySyncNewPosts", true);
+      
+      // Also send an email notification
+      var posts = fb.getData("posts", {shallow: "true"});
+      var nbOfPosts = Object.keys(posts).length;
+      var currentUserEmailAddress = Session.getEffectiveUser();
+      var subject = "Google+ exporter to Firebase - migration completed!";
+      var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + searchQuery + "'<br>";
+      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/top";
+      body+= linkToSearchResultsInGooglePlus+ "<br><br>";
+      body+= "If you have completed the tutorial, all those posts should be available here:<br>";
+      body+= firebaseBaseUrl.replace("firebaseio.com", "firebaseapp.com");
+      body+= "<br><br>New posts will also be automatically exported every day.";
+      MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
     }
     else {
       // update lastSyncDate

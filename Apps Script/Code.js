@@ -51,7 +51,8 @@ function getAllPosts() {
     for (var i in posts) {
       nbOfPostsRetrieved++;
       var postId = posts[i].id;
-      fb.setData("posts/" + postId, posts[i]);
+      var postData = {};
+      postData["posts/" + postId] = posts[i];
 
       // retrieve comments
       var comments = ErrorHandler.expBackoff(function(){
@@ -65,7 +66,7 @@ function getAllPosts() {
         else {
           for (var j in comments) {
             var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
-            fb.setData("comments/" + postId + "/" + commentId, comments[j]);
+            postData["comments/" + postId + "/" + commentId] = comments[j];
           }
         }
       }
@@ -82,7 +83,7 @@ function getAllPosts() {
         else {
           for (var j in plusoners) {
             var plusoneId = plusoners[j].id;
-            fb.setData("plusoners/" + postId + "/" + plusoneId, plusoners[j]);
+            postData["plusoners/" + postId + "/" + plusoneId] = plusoners[j];
           }
         }
       }
@@ -99,10 +100,12 @@ function getAllPosts() {
         else {
           for (var j in resharers) {
             var reshareId = resharers[j].id;
-            fb.setData("resharers/" + postId + "/" + reshareId, resharers[j]);
+            postData["resharers/" + postId + "/" + reshareId] = resharers[j];
           }
         }
       }
+      // Firebase multi-location updates
+      fb.updateData('', postData);
     }
     
     ErrorHandler.expBackoff(function(){

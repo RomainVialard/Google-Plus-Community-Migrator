@@ -1,5 +1,12 @@
-function getAllPosts() {
-  var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
+function getAllPosts() {  
+  var lock = LockService.getScriptLock();
+  // wait for 100ms only. If one instance of the script is already executing, abort.
+  var lockAcquired = lock.tryLock(100);
+  if (!lockAcquired) return;
+
+  var Plus = buildPlus_();
+  
+  var firebaseBaseUrl = "https://brainysmurf-gplus-community.firebaseio.com/";
   var communityId = "102471985047225101769";
   var searchQuery = "community:" + communityId;
   // you can use as the searchQuery most advanced search features listed here:
@@ -8,12 +15,7 @@ function getAllPosts() {
 
   var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   var startTime = Date.now();
-  
-  var lock = LockService.getScriptLock();
-  // wait for 100ms only. If one instance of the script is already executing, abort.
-  var lockAcquired = lock.tryLock(100);
-  if (!lockAcquired) return;
-  
+    
   var scriptProperties = PropertiesService.getScriptProperties();
   
   // Retrieving all the posts you want (eg: all posts from a specific community) might take quite a long time
@@ -23,7 +25,7 @@ function getAllPosts() {
   // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (!triggers.length) {
-    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    //ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     scriptProperties.setProperty("lastSyncDate", today);
@@ -31,7 +33,11 @@ function getAllPosts() {
   
   var properties = scriptProperties.getProperties();
   var nextPageToken = properties["nextPageToken"] || null;
-  var nbOfPostsRetrieved = properties["nbOfPostsRetrieved"] || 0;
+  var nbOfPostsRetrieved = parseInt(properties["nbOfPostsRetrieved"]) || 0;
+  var nbOfRepliesRetrieved = parseInt(properties["nbOfRepliesRetrieved"]) || 0;
+  var nbOfPlusonersRetrieved = parseInt(properties["nbOfPlusonersRetrieved"]) || 0;
+  var nbOfResharersRetrieved = parseInt(properties["nbOfResharersRetrieved"]) || 0;
+  var tmProcessBegan = properties["tmProcessBegan"] || Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'");
   var lastSyncDate = properties["lastSyncDate"] || today;
   var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
   if (onlySyncNewPosts) {
@@ -41,69 +47,60 @@ function getAllPosts() {
   
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
-  
+
   do {
-    var activityFeed = Plus.Activities.search(searchQuery, {pageToken: nextPageToken});
+    
+    var activityFeed = ErrorHandler.expBackoff(function () {
+       return Plus.getPosts({/* no templating */}, {
+        query: { // query here indicates the api wants a query string
+          query: searchQuery,  // query here is the name of the parameter
+          nextPageToken: nextPageToken
+        }
+      }).json();
+    });
+    
+    if (activityFeed instanceof Error) {
+      informUser_('Error: ' + activityFeed.message || 'unknown');
+      removeTriggers_();
+      return;
+    }
+    
+    // get posts by resolving the json
     var posts = activityFeed.items;
     nextPageToken = activityFeed.nextPageToken;
     if (!posts.length) nextPageToken = null;
 
     for (var i in posts) {
       nbOfPostsRetrieved++;
+      nbOfRepliesRetrieved += posts[i].object.replies.totalItems;
+      nbOfPlusonersRetrieved += posts[i].object.plusoners.totalItems;
+      nbOfResharersRetrieved += posts[i].object.resharers.totalItems;
+      
       var postId = posts[i].id;
       var postData = {};
       postData["posts/" + postId] = posts[i];
 
-      // retrieve comments
-      var comments = ErrorHandler.expBackoff(function(){
-        return Plus.Comments.list(postId).items;
-      });
-      if (comments) {
-        if (comments instanceof Error) {
-          // Abort if no quota
-          if (comments.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
-        }
-        else {
-          for (var j in comments) {
-            var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
-            postData["comments/" + postId + "/" + commentId] = comments[j];
-          }
-        }
-      }
-
-      // retrieve plusoners
-      var plusoners = ErrorHandler.expBackoff(function(){
-        return Plus.People.listByActivity(postId, "plusoners").items;
-      });
-      if (plusoners) {
-        if (plusoners instanceof Error) {
-          // Abort if no quota
-          if (plusoners.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
-        }
-        else {
-          for (var j in plusoners) {
-            var plusoneId = plusoners[j].id;
-            postData["plusoners/" + postId + "/" + plusoneId] = plusoners[j];
-          }
-        }
+      // retrive comments, plusoners, and resharers concurrently
+      // TODO: Handle errors from there
+      
+      var plusoners, resharers, comments;
+      var [plusoners, resharers, comments] = concurrentlyGetPostItems(postId);
+      
+      for (var j in comments) {
+        var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
+        postData["comments/" + postId + "/" + commentId] = comments[j];
       }
       
-      // retrieve resharers      
-      var resharers = ErrorHandler.expBackoff(function(){
-        return Plus.People.listByActivity(postId, "resharers").items;
-      });
-      if (resharers) {
-        if (resharers instanceof Error) {
-          // Abort if no quota
-          if (resharers.message === ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) return;
-        }
-        else {
-          for (var j in resharers) {
-            var reshareId = resharers[j].id;
-            postData["resharers/" + postId + "/" + reshareId] = resharers[j];
-          }
-        }
+      for (var j in plusoners) {
+        var plusoneId = plusoners[j].id;
+        postData["plusoners/" + postId + "/" + plusoneId] = plusoners[j];
       }
+      
+      for (var j in resharers) {
+        var reshareId = resharers[j].id;
+        postData["resharers/" + postId + "/" + reshareId] = resharers[j];
+      }
+      
       // Firebase multi-location updates
       fb.updateData('', postData);
     }
@@ -111,16 +108,20 @@ function getAllPosts() {
     ErrorHandler.expBackoff(function(){
       scriptProperties.setProperties({
         'nextPageToken': nextPageToken,
-        'nbOfPostsRetrieved': nbOfPostsRetrieved
+        'nbOfPostsRetrieved': nbOfPostsRetrieved.toFixed(0),
+        'nbOfRepliesRetrieved': nbOfRepliesRetrieved.toFixed(0),
+        'nbOfPlusonersRetrieved': nbOfPlusonersRetrieved.toFixed(0),
+        'nbOfResharersRetrieved': nbOfResharersRetrieved.toFixed(0),
+        'tmProcessBegan': tmProcessBegan,
       });
     });
     
     console.log(nbOfPostsRetrieved + " posts retrieved so far");
-  
-    // stop if script run for more than 4 min (next trigger will process next batch)
+ 
+    // stop if script run for more than 4.5 mins (next trigger will process next batch)
     // or if there's no more posts to retrieve (nextPageToken is null)
-  } while (Date.now() - startTime < 4 * 60 * 1000 && nextPageToken);
-  
+  } while (Date.now() - startTime < 4.5 * 60 * 1000 && nextPageToken);
+
   if (!nextPageToken) {
     if (!onlySyncNewPosts) {
       // Once the full export is done, keep syncing but only retrieve new posts
@@ -138,10 +139,6 @@ function getAllPosts() {
       body+= firebaseBaseUrl.replace("firebaseio.com", "firebaseapp.com");
       body+= "<br><br>New posts will also be automatically exported every day.";
       MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
-    }
-    else {
-      // update lastSyncDate
-      scriptProperties.setProperty("lastSyncDate", today);
     }
   }
 }

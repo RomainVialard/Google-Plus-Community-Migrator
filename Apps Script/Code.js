@@ -51,7 +51,8 @@ function getAllPosts() {
     for (var i in posts) {
       nbOfPostsRetrieved++;
       var postId = posts[i].id;
-      fb.setData("posts/" + postId, posts[i]);
+      var postData = {};
+      postData["posts/" + postId] = posts[i];
 
       // retrieve comments
       var comments = ErrorHandler.expBackoff(function(){
@@ -65,7 +66,7 @@ function getAllPosts() {
         else {
           for (var j in comments) {
             var commentId = FirebaseApp.encodeAsFirebaseKey(comments[j].id);
-            fb.setData("comments/" + postId + "/" + commentId, comments[j]);
+            postData["comments/" + postId + "/" + commentId] = comments[j];
           }
         }
       }
@@ -82,7 +83,7 @@ function getAllPosts() {
         else {
           for (var j in plusoners) {
             var plusoneId = plusoners[j].id;
-            fb.setData("plusoners/" + postId + "/" + plusoneId, plusoners[j]);
+            postData["plusoners/" + postId + "/" + plusoneId] = plusoners[j];
           }
         }
       }
@@ -99,10 +100,12 @@ function getAllPosts() {
         else {
           for (var j in resharers) {
             var reshareId = resharers[j].id;
-            fb.setData("resharers/" + postId + "/" + reshareId, resharers[j]);
+            postData["resharers/" + postId + "/" + reshareId] = resharers[j];
           }
         }
       }
+      // Firebase multi-location updates
+      fb.updateData('', postData);
     }
     
     ErrorHandler.expBackoff(function(){
@@ -122,6 +125,19 @@ function getAllPosts() {
     if (!onlySyncNewPosts) {
       // Once the full export is done, keep syncing but only retrieve new posts
       scriptProperties.setProperty("onlySyncNewPosts", true);
+      
+      // Also send an email notification
+      var posts = fb.getData("posts", {shallow: "true"});
+      var nbOfPosts = Object.keys(posts).length;
+      var currentUserEmailAddress = Session.getEffectiveUser();
+      var subject = "Google+ exporter to Firebase - migration completed!";
+      var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + searchQuery + "'<br>";
+      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/top";
+      body+= linkToSearchResultsInGooglePlus+ "<br><br>";
+      body+= "If you have completed the tutorial, all those posts should be available here:<br>";
+      body+= firebaseBaseUrl.replace("firebaseio.com", "firebaseapp.com");
+      body+= "<br><br>New posts will also be automatically exported every day.";
+      MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
     }
     else {
       // update lastSyncDate

@@ -52,6 +52,13 @@ function isUserSignedIn() {
 let referenceToOldestKey = '';
 
 function loadPosts() {
+  // Display a message to the user using a Toast.
+  var data = {
+    message: nbOfPostsDisplayed + ' posts displayed. Loading more posts...',
+    timeout: 1500
+  };
+  if (snackbarElement && snackbarElement.MaterialSnackbar) snackbarElement.MaterialSnackbar.showSnackbar(data);
+
   var callback = function(snap) {
     var postId = snap.key;
     var postData = snap.val();
@@ -61,12 +68,13 @@ function loadPosts() {
     }
   };
 
-  var query = firebase.database().ref('/posts/').orderByChild('published').limitToLast(10);
+  var query = firebase.database().ref('/posts/').orderByChild('published');
   if (referenceToOldestKey) {
-    query = query.endAt(referenceToOldestKey);
+    // retrieve 10 additional posts + the last one previously retrieved: 11
+    query = query.limitToLast(11).endAt(referenceToOldestKey);
   }
+  else query = query.limitToLast(10);
   query.on('child_added', callback);
-  // firebase.database().ref('/posts/').limitToLast(100).on('child_changed', callback);
 }
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
@@ -110,7 +118,7 @@ function checkSignedInWithMessage() {
     message: 'You must sign-in first',
     timeout: 2000
   };
-  signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+  snackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
 }
 
@@ -131,6 +139,7 @@ function displayPost(postId, postData) {
   if (!referenceToOldestPost) postListElement.appendChild(div);
   else postListElement.insertBefore(div, referenceToOldestPost);
   referenceToOldestPost = div;
+  nbOfPostsDisplayed++;
 
   div.querySelector('.MqU2J').src = postData.actor.image.url;
   div.querySelector('.sXku1c').textContent = postData.actor.displayName;
@@ -195,26 +204,13 @@ function displayPost(postId, postData) {
 
 }
 
-// Checks that the Firebase SDK has been correctly setup and configured.
-function checkSetup() {
-  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
-    window.alert('You have not configured and imported the Firebase SDK. ' +
-        'Make sure you go through the codelab setup instructions and make ' +
-        'sure you are running the codelab using `firebase serve`');
-  }
-}
-
-// Checks that Firebase has been imported.
-checkSetup();
-
 // Shortcuts to DOM Elements.
 var postListElement = document.getElementById('posts');
 var userPicElement = document.getElementById('user-pic');
 var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
-var signInSnackbarElement = document.getElementById('must-signin-snackbar');
-let referenceToOldestPost = '';
+var snackbarElement = document.getElementById('snackbar');
 
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
@@ -222,7 +218,12 @@ signInButtonElement.addEventListener('click', signIn);
 // initialize Firebase
 initFirebaseAuth();
 
+let referenceToOldestPost = '';
+let nbOfPostsDisplayed = 0;
+
+// load the first 10 posts right away
 loadPosts();
+// load 10 more posts once user scrolled to the bottom of the page
 document.getElementsByTagName('main')[0].addEventListener('scroll', function(event) {
   var element = event.target;
   if (Math.round(element.scrollHeight - element.scrollTop) === Math.round(element.clientHeight)) {

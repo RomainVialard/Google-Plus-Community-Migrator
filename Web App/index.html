@@ -139,8 +139,10 @@
                   </div>
                 </div>
 
-                <div class="CKe11d" role="button" tabindex="0" aria-label="View comments">
+                <div class="CKe11d" role="button" tabindex="0" aria-label="View comments" onclick="displayAllComments(this)">
                   <div aria-hidden="true">
+
+                    <!-- Preview of comments, showing only the beginning of the last 3 comments -->
                     <div class="EMg45">
                       <template>
                         <div class="X865Z">
@@ -148,6 +150,28 @@
                         </div>
                       </template>
                     </div>
+
+                    <!-- Full comments list -->
+                    <div class="RIrM6d" aria-label="Comments" style="display:none">
+                      <ul class="AarIR dYuyre fFUsIf">
+                        <template>
+                          <li class="OnSI9b BCNiN XkfHGe" tabindex="-1">
+                            <span class="h7vvy oFkD6c"><img class="MqU2J" height="36" width="36" src=""></span>
+                            <div class="PGAhe" role="heading" aria-level="3">
+                              <div class="kCYXq"><span class="vGowKb"></span><span class="iOAN1d"></span></div>
+                              <div class="g6UaYd">
+                                <!-- comment -->
+                                <div></div>
+                              </div>
+                            </div>
+                            <div class="Ahjhqf MtqTje">
+                              <div class="gmFStc"><span></span></div>
+                            </div>
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+
                   </div>
                 </div>
 

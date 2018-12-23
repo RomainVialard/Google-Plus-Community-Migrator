@@ -236,3 +236,30 @@ function expandPost(el) {
   el.classList.remove("qhIQqf");
   el.querySelector('.jVjeQd').style['max-height'] = 'none';
 }
+
+function displayAllComments(el) {
+  el.querySelector('.EMg45').style.display = 'none';
+  var fullCommentListParentEl = el.querySelector('.RIrM6d');
+  var postId = fullCommentListParentEl.parentNode.parentNode.parentNode.parentNode.parentNode.id;
+
+  fullCommentListParentEl.style.display = 'block';
+
+  var commentSection = fullCommentListParentEl.querySelector("ul");
+  var commentTemplate = commentSection.querySelector("template");
+
+  var path = '/comments/' + postId;
+  var query = firebase.database().ref(path).orderByChild('published');
+  query.on('child_added', function (snapshot) {
+    if(snapshot.val()) {
+      var comment = snapshot.val();
+      var copy = document.importNode(commentTemplate.content, true);
+      var li = copy.querySelector('li');
+      commentSection.appendChild(li);
+      li.querySelector('.vGowKb').textContent = comment.actor.displayName;
+      li.querySelector('.MqU2J').src = comment.actor.image.url;
+      li.querySelector('.g6UaYd').querySelector('div').innerHTML = comment.object.content;
+      var publicationDate = moment(comment.published);
+      li.querySelector('.gmFStc').querySelector('span').textContent = publicationDate.fromNow();
+    }
+  });
+}

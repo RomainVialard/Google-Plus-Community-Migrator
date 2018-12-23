@@ -25,7 +25,7 @@ function getAllPosts() {
   // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (!triggers.length) {
-    //ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     scriptProperties.setProperty("lastSyncDate", today);

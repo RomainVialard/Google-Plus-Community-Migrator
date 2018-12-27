@@ -296,7 +296,7 @@ function togglePlusoned(el) {
 
     // Firebase: write the new +1's data simultaneously in the post's plusoners list and the post.
     var updates = {};
-    updates['/posts/' + postId + "/object/plusoners/totalItems"] = el.dataset.count;
+    updates['/posts/' + postId + "/object/plusoners/totalItems"] = +el.dataset.count;
     updates['/plusoners/' + postId + '/' + userGoogleId] = null;
     firebase.database().ref().update(updates, function(error) {
       if (error) {
@@ -314,7 +314,7 @@ function togglePlusoned(el) {
 
     // Firebase: write the new +1's data simultaneously in the post's plusoners list and the post data.
     var updates = {};
-    updates['/posts/' + postId + "/object/plusoners/totalItems"] = el.dataset.count;
+    updates['/posts/' + postId + "/object/plusoners/totalItems"] = +el.dataset.count;
     updates['/plusoners/' + postId + '/' + userGoogleId] = {
       displayName: firebase.auth().currentUser.displayName,
       // etag: "",
@@ -325,6 +325,7 @@ function togglePlusoned(el) {
       kind: "plus#person",
       url: "https://profiles.google.com/" + userGoogleId
     };
+
     firebase.database().ref().update(updates, function(error) {
       if (error) {
         console.log(error);

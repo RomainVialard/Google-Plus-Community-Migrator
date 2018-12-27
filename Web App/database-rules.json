@@ -39,9 +39,8 @@
           "plusoners": { // People who +1'd this activity.
             "selfLink": {},
             "totalItems": { // Total number of people who +1'd this activity.
-              // Best would be to add more security following this example:
-              // https://stackoverflow.com/questions/37954217/is-the-way-the-firebase-database-quickstart-handles-counts-secure/37956590#37956590
-              ".write": "auth != null"
+              ".write": "auth != null",
+              ".validate": "(newData.val() == data.val() + 1 && newData.parent().parent().parent().parent().parent().child('plusoners/' + $post_id + '/' + auth.token.firebase.identities['google.com'][0]).exists() && !data.parent().parent().parent().parent().parent().child('plusoners/' + $post_id + '/' + auth.token.firebase.identities['google.com'][0]).exists()) || (newData.val() == data.val() - 1  && !newData.parent().parent().parent().parent().parent().child('plusoners/' + $post_id + '/' + auth.token.firebase.identities['google.com'][0]).exists() && data.parent().parent().parent().parent().parent().child('plusoners/' + $post_id + '/' + auth.token.firebase.identities['google.com'][0]).exists())"
             }
           },
 
@@ -80,7 +79,8 @@
       "$post_id": { // The ID of an activity.
         "$google_id": { // The Google ID of the person who +1'd this activity.
 
-          ".write": "auth != null && auth.token.firebase.identities[\"google.com\"][0] == $google_id",
+          ".write": "auth != null && auth.token.firebase.identities['google.com'][0] == $google_id",
+          ".validate": "(!data.exists() && newData.parent().parent().parent().child('posts/' + $post_id + '/object/plusoners/totalItems').val() == data.parent().parent().parent().child('posts/' + $post_id + '/object/plusoners/totalItems').val() + 1) || (data.exists() && newData.val() == null && newData.parent().parent().parent().child('posts/' + $post_id + '/object/plusoners/totalItems').val() == data.parent().parent().parent().child('posts/' + $post_id + '/object/plusoners/totalItems').val() - 1)",
 
           "displayName": {},
           "etag": {},

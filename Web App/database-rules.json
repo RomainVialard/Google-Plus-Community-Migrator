@@ -4,12 +4,91 @@
     ".write": false,
 
     "posts": {
-      ".indexOn": ["published"]
+      ".indexOn": ["published"],
+
+      "$post_id": {
+
+        "access": {
+          "description": {},
+          "items": {},
+          "kind": {}
+        },
+
+        "actor": { // The person who performed this activity.
+          "displayName": {}, // The name of the actor, suitable for display.
+          "id": {}, // The ID of the actor's Person resource.
+          "image": { // The image representation of the actor.
+            "url": {} // The URL of the actor's profile photo. To resize the image and crop it to a square,
+                      // append the query string ?sz=x, where x is the dimension in pixels of each side.
+          },
+          "url": {}, // The link to the actor's Google profile.
+          "verification": {}
+        },
+
+        "etag": {},
+        "id": {}, // The ID of this activity.
+        "kind": {}, // Identifies this resource as an activity. Value: "plus#activity".
+
+        "object": { // The object of this activity.
+          "actor": {}, // If this activity's object is itself another activity, such as when a person reshares an activity,
+                       // this property specifies the original activity's actor.
+          "attachments": {}, // The media objects attached to this activity.
+          "content": {}, // The HTML-formatted content, which is suitable for display.
+          "objectType": {},
+
+          "plusoners": { // People who +1'd this activity.
+            "selfLink": {},
+            "totalItems": { // Total number of people who +1'd this activity.
+              // Best would be to add more security following this example:
+              // https://stackoverflow.com/questions/37954217/is-the-way-the-firebase-database-quickstart-handles-counts-secure/37956590#37956590
+              ".write": "auth != null"
+            }
+          },
+
+          "replies": { // Comments in reply to this activity.
+            "selfLink": {},
+            "totalItems": {} // Total number of comments on this activity.
+          },
+
+          "resharers": { // People who reshared this activity.
+            "selfLink": {},
+            "totalItems": {} // Total number of people who reshared this activity.
+          },
+
+          "url": {}
+        },
+
+        "provider": {
+          "title": {}
+        },
+
+        "published": {}, // The time at which this activity was initially published. Formatted as an RFC 3339 timestamp.
+        "title": {}, // Title of this activity.
+        "updated": {}, // The time at which this activity was last updated. Formatted as an RFC 3339 timestamp.
+        "url": {}, // The link to this activity.
+        "verb": {}
+      }
     },
 
     "comments": {
       "$post_id": {
         ".indexOn": ["published"]
+      }
+    },
+
+    "plusoners": {
+      "$post_id": { // The ID of an activity.
+        "$google_id": { // The Google ID of the person who +1'd this activity.
+
+          ".write": "auth != null && auth.token.firebase.identities[\"google.com\"][0] == $google_id",
+
+          "displayName": {},
+          "etag": {},
+          "id": {},
+          "image": {},
+          "kind": {},
+          "url": {}
+        }
       }
     }
   }

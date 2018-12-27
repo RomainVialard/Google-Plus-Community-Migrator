@@ -163,16 +163,26 @@ function displayPost(postId, postData) {
   }
 
   // LIKES / PLUSONES
-  div.querySelector('.M8ZOee').textContent = postData.object.plusoners.totalItems;
+  var plusOnesContainer = div.querySelector('.oHo9me');
+  plusOnesContainer.dataset.itemid = "update/" + postId;
+
+  var nbOfPlusones = postData.object.plusoners.totalItems;
+  plusOnesContainer.dataset.count = nbOfPlusones;
+  div.querySelector('.M8ZOee').textContent = nbOfPlusones;
+
   // Check if current user has +1 this post. In that case, make the +1 button red.
   var currentUser = firebase.auth().currentUser;
   if (currentUser) {
     var path = '/plusoners/' + postId + '/' + currentUser.providerData[0].uid + '/id';
     firebase.database().ref(path).once('value').then(function(snapshot) {
       if(snapshot.val()) {
-        var element = div.querySelector('[aria-label="+1"]');
+        var element = plusOnesContainer.querySelector('[aria-label="+1"]');
         element.classList.add('y7OZL');
         element.classList.add('M9Bg4d');
+        plusOnesContainer.dataset.pressed = true;
+      }
+      else {
+        plusOnesContainer.dataset.pressed = false;
       }
     });
 
@@ -262,4 +272,67 @@ function displayAllComments(el) {
       li.querySelector('.gmFStc').querySelector('span').textContent = publicationDate.fromNow();
     }
   });
+}
+
+function togglePlusoned(el) {
+  // check if user is authenticated. If not, display alert
+  if (!firebase.auth().currentUser) {
+    // Display a message to the user using a Toast.
+    var data = {
+      message: 'You must sign-in to +1 a post.',
+      timeout: 1500
+    };
+    snackbarElement.MaterialSnackbar.showSnackbar(data);
+    return;
+  }
+
+  var postId = el.dataset.itemid.replace("update/", "");
+  var userGoogleId = firebase.auth().currentUser.providerData[0].uid;
+
+  var subEl = el.querySelector('[aria-label="+1"]');
+  if (el.dataset.pressed == "true") {
+    el.dataset.pressed = false;
+    el.dataset.count--;
+
+    // Firebase: write the new +1's data simultaneously in the post's plusoners list and the post.
+    var updates = {};
+    updates['/posts/' + postId + "/object/plusoners/totalItems"] = el.dataset.count;
+    updates['/plusoners/' + postId + '/' + userGoogleId] = null;
+    firebase.database().ref().update(updates, function(error) {
+      if (error) {
+        console.log(error);
+      } else {
+        subEl.classList.remove('y7OZL');
+        subEl.classList.remove('M9Bg4d');
+        el.parentNode.querySelector('.M8ZOee').textContent = el.dataset.count;
+      }
+    });
+  }
+  else {
+    el.dataset.pressed = true;
+    el.dataset.count++;
+
+    // Firebase: write the new +1's data simultaneously in the post's plusoners list and the post data.
+    var updates = {};
+    updates['/posts/' + postId + "/object/plusoners/totalItems"] = el.dataset.count;
+    updates['/plusoners/' + postId + '/' + userGoogleId] = {
+      displayName: firebase.auth().currentUser.displayName,
+      // etag: "",
+      id: userGoogleId,
+      image: {
+        url: firebase.auth().currentUser.photoURL
+      },
+      kind: "plus#person",
+      url: "https://profiles.google.com/" + userGoogleId
+    };
+    firebase.database().ref().update(updates, function(error) {
+      if (error) {
+        console.log(error);
+      } else {
+        subEl.classList.add('y7OZL');
+        subEl.classList.add('M9Bg4d');
+        el.parentNode.querySelector('.M8ZOee').textContent = el.dataset.count;
+      }
+    });
+  }
 }

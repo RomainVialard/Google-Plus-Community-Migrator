@@ -1,6 +1,6 @@
 {
-  "name": "Google Apps Script community",
-  "short_name": "Apps Script community",
+  "name": "G+ community",
+  "short_name": "G+ community",
   "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait"

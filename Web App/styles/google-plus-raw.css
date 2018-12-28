@@ -13,14 +13,6 @@ img {
   -webkit-tap-highlight-color: transparent;
 }
 
-c-wiz {
-  contain: style;
-}
-
-c-wiz>c-data {
-  display: none;
-}
-
 .XVzU0b {
   display: inline-block;
   height: 24px;
@@ -307,21 +299,6 @@ c-wiz>c-data {
   margin-right: 0;
 }
 
-.Bt2WQc {
-  color: #2962ff;
-  font-size: 13px;
-  margin: 16px 16px;
-}
-
-.SA9gPc {
-  cursor: pointer;
-  color: #2962ff;
-}
-
-.iuERkd {
-  padding: 0 7px;
-}
-
 .tpVlOc {
   display: -webkit-box;
   display: -moz-box;
@@ -452,17 +429,6 @@ c-wiz>c-data {
   flex: auto;
 }
 
-.rjXqDe .IJ13Ic {
-  display: block;
-}
-
-/*
-.IJ13Ic,
-.rjXqDe .sRhiGb {
-  display: none;
-}
-*/
-
 .HiU1rc {
   color: #ff0000;
   font-weight: bold;
@@ -544,11 +510,6 @@ c-wiz>c-data {
   right: 0;
 }
 
-.ZTemg {
-  height: 18px;
-  width: 18px;
-}
-
 .UohHvc {
   display: -webkit-box;
   display: -moz-box;
@@ -556,11 +517,6 @@ c-wiz>c-data {
   display: -ms-flexbox;
   display: flex;
   max-width: 100%;
-}
-
-.g5imIb {
-  height: 18px;
-  width: 18px;
 }
 
 .g5imIb path {
@@ -739,24 +695,6 @@ c-wiz>c-data {
   fill: #000;
 }
 
-/*
-.cDhoub {
-  max-width: 530px;
-  min-width: 140px;
-  width: 100%;
-  margin: 0 auto 0;
-  outline: none;
-  -webkit-transition: background-color 200ms ease-in;
-  transition: background-color 200ms ease-in;
-  z-index: initial;
-}
-*/
-
-.cDhoub.iFJd6c {
-  -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
 .cjGgHb .cDhoub:hover .eZ8gzf,
 .cjGgHb .cDhoub:hover .n8JNod {
   z-index: auto;
@@ -810,10 +748,6 @@ c-wiz>c-data {
 
 .R6Ozpf {
   position: relative;
-}
-
-.R6Ozpf.sMVRZe {
-  overflow: hidden;
 }
 
 .R6Ozpf.qhIQqf {
@@ -941,28 +875,8 @@ c-wiz>c-data {
   overflow: hidden;
 }
 
-/*
-.G7pzvd {
-  height: 18px;
-  width: 18px;
-  margin: 2px;
-}
-*/
-
 .G7pzvd path {
   fill: #757575;
-}
-
-.teCjMb.y7OZL {
-  background-color: #db4437;
-  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26)
-}
-
-.teCjMb.y7OZL.u3bW4e,.cjGgHb .teCjMb.y7OZL:hover {
-  background-color: #c53929;
-  -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.54);
-  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.54)
 }
 
 .teCjMb.y7OZL path,.teCjMb.y7OZL.u3bW4e path,.cjGgHb .teCjMb.y7OZL:hover path {
@@ -1113,10 +1027,6 @@ c-wiz>c-data {
   border-width: 0 0 0 4px
 }
 
-.OnSI9b.eLNT1d {
-  display: none
-}
-
 .BCNiN {
   overflow: hidden;
   padding: 12px 16px;
@@ -1129,29 +1039,8 @@ c-wiz>c-data {
   transition: background-color .3s cubic-bezier(0,0,0.2,1)
 }
 
-.BCNiN.g0Pkrd {
-  background-color: #fff;
-  display: block
-}
-
-.BCNiN.g0Pkrd.u3bW4e {
-  background-color: #fff
-}
-
-.BCNiN.g0Pkrd:first-child {
-  border-top: 1px solid #ebebeb
-}
-
 .BCNiN:focus {
   outline: none
-}
-
-.BCNiN.u3bW4e {
-  background-color: #fafafa
-}
-
-.BCNiN:hover .Yylo3e,.BCNiN.u3bW4e .Yylo3e {
-  opacity: 1
 }
 
 .BCNiN:hover .Ahjhqf.MtqTje .gmFStc,.BCNiN.u3bW4e .Ahjhqf.MtqTje .gmFStc {
@@ -1169,11 +1058,6 @@ c-wiz>c-data {
   -webkit-box-flex: none;
   -webkit-flex: none;
   flex: none
-}
-
-.oFkD6c.bhRcab {
-  background: #f44336;
-  fill: #fff
 }
 
 .MqU2J {
@@ -1229,10 +1113,6 @@ c-wiz>c-data {
   flex-shrink: 0
 }
 
-.iOAN1d.vnoo4e {
-  color: #b93221
-}
-
 .g6UaYd {
   font-size: 14px;
   line-height: 20px;
@@ -1273,10 +1153,6 @@ c-wiz>c-data {
   cursor: pointer
 }
 
-.e8zLFb.GSnotf {
-  padding: 12px 0 4px
-}
-
 .uvi9me {
   position: relative;
   margin: auto
@@ -1287,39 +1163,6 @@ c-wiz>c-data {
   border-radius: 2px;
   overflow: hidden;
   margin: 0
-}
-
-.zUOARd {
-  outline: none;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0 16px 16px;
-  color: #fff;
-  max-width: 100%;
-  position: absolute;
-  white-space: nowrap;
-  background-color: 0;
-  background-image: -webkit-linear-gradient(to top,rgba(0,0,0,.75),transparent);
-  background-image: linear-gradient(to top,rgba(0,0,0,.75),transparent)
-}
-
-.e8zLFb.GSnotf .zUOARd {
-  padding: 0 10px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px
-}
-
-.prbHAf {
-  font-size: 16px;
-  font-weight: 500;
-  margin: 15px 0 5px 0;
-  overflow: hidden;
-  text-overflow: ellipsis
-}
-
-.e8zLFb.GSnotf .prbHAf {
-  font-size: 14px
 }
 
 .E68jgf {

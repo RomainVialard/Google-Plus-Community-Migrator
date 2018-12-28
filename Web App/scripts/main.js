@@ -106,25 +106,6 @@ function authStateObserver(user) {
   }
 }
 
-// Returns true if user is signed-in. Otherwise false and displays a message.
-function checkSignedInWithMessage() {
-  // Return true if the user is signed in Firebase
-  if (isUserSignedIn()) {
-    return true;
-  }
-
-  // Display a message to the user using a Toast.
-  var data = {
-    message: 'You must sign-in first',
-    timeout: 2000
-  };
-  snackbarElement.MaterialSnackbar.showSnackbar(data);
-  return false;
-}
-
-// A loading image URL.
-var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
-
 // Displays a Post in the UI.
 function displayPost(postId, postData) {
   var div = document.getElementById(postId);

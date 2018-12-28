@@ -284,7 +284,6 @@ function togglePlusoned(el) {
         console.log(error);
       } else {
         subEl.classList.remove('y7OZL');
-        subEl.classList.remove('M9Bg4d');
         el.parentNode.querySelector('.M8ZOee').textContent = el.dataset.count;
       }
     });
@@ -312,7 +311,6 @@ function togglePlusoned(el) {
         console.log(error);
       } else {
         subEl.classList.add('y7OZL');
-        subEl.classList.add('M9Bg4d');
         el.parentNode.querySelector('.M8ZOee').textContent = el.dataset.count;
       }
     });

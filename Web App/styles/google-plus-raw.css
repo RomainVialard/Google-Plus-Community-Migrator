@@ -879,6 +879,18 @@ img {
   fill: #757575;
 }
 
+.teCjMb.y7OZL {
+  background-color: #db4437;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26)
+}
+
+.teCjMb.y7OZL.u3bW4e,.cjGgHb .teCjMb.y7OZL:hover {
+  background-color: #c53929;
+  -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.54);
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.54)
+}
+
 .teCjMb.y7OZL path,.teCjMb.y7OZL.u3bW4e path,.cjGgHb .teCjMb.y7OZL:hover path {
   fill: #fff
 }

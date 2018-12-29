@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "firebase-tools": "^6.2.2"
+  },
+  "scripts": {
+    "start": "firebase help"
+  }
+}

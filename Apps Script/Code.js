@@ -141,7 +141,7 @@ function getAllPosts(options) {
       });
       
       if (responses instanceof Error) {
-        informUser("Error: " + responses.message);
+        informUser_("Error: " + responses.message);
         removeTriggers_();
         return;
       }

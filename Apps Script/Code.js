@@ -1,6 +1,10 @@
-function getAllPosts(options) {   
-  /* modular libraries */
-  var Requests = Import.Requests();
+function getAllPosts(options) {
+  var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
+  var communityId = "102471985047225101769";
+  var searchQuery = "community:" + communityId;
+  // you can use as the searchQuery most advanced search features listed here:
+  // https://support.google.com/plus/answer/1669519
+  // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
   
   var lock = LockService.getScriptLock();
   // wait for 100ms only. If one instance of the script is already executing, abort.
@@ -9,20 +13,15 @@ function getAllPosts(options) {
     Logger.log('no lock');
     return;
   }
-  
+
+  var Requests = Import.Requests();
+
   /*
     This provides us with the Plus_ variable
     It builds the requisite API endpoint information via the discovery API 
   */
   buildPlus_();
   
-  var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
-  var communityId = "102471985047225101769";
-  var searchQuery = "community:" + communityId;
-  // you can use as the searchQuery most advanced search features listed here:
-  // https://support.google.com/plus/answer/1669519
-  // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
-
   var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   var startTime = Date.now();
     
@@ -35,7 +34,7 @@ function getAllPosts(options) {
   // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (triggers.length == 0) {
-    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    //ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     scriptProperties.setProperty("lastSyncDate", today);
@@ -46,7 +45,6 @@ function getAllPosts(options) {
   var nbOfPostsRetrieved = parseInt(properties["nbOfPostsRetrieved"]) || 0;
   var nbOfRepliesRetrieved = parseInt(properties["nbOfRepliesRetrieved"]) || 0;
   var nbOfPlusonersRetrieved = parseInt(properties["nbOfPlusonersRetrieved"]) || 0;
-  var nbOfResharersRetrieved = parseInt(properties["nbOfResharersRetrieved"]) || 0;
   var tmProcessBegan = properties["tmProcessBegan"] || Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'");
   var lastSyncDate = properties["lastSyncDate"] || today;
   var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
@@ -60,7 +58,7 @@ function getAllPosts(options) {
 
   do {
 
-    // collect 10 results, and then interact with the comments/plusoners/resharers
+    // collect 10 results, and then interact with the comments/plusoners
     var count = 1;
     var feedCompilation = {
       postItems: [],      // compilation of all 10 posts item results
@@ -76,7 +74,8 @@ function getAllPosts(options) {
         */
         var query;
         query = {
-          query: searchQuery
+          query: searchQuery,
+          maxResults: 20
         };
         if (nextPageToken) query.pageToken = nextPageToken;
 
@@ -104,19 +103,25 @@ function getAllPosts(options) {
         feedCompilation.requests.push(
           Plus_.getComments({
             activityId: post.id,
-          }, {}, false)
+          }, {
+            maxResults: 250
+          }, false)
         );
-        feedCompilation.requests.push(
-          Plus_.getPostInformation({
-            activityId: post.id,
-            collection: 'resharers'
-          }, {}, false)
-        );
+//        feedCompilation.requests.push(
+//          Plus_.getPostInformation({
+//            activityId: post.id,
+//            collection: 'resharers'
+//          }, {
+//            maxResults: 100
+//          }, false)
+//        );
         feedCompilation.requests.push(
           Plus_.getPostInformation({
             activityId: post.id,
             collection: 'plusoners'
-          }, {}, false)
+          }, {
+            maxResults: 250
+          }, false)
         );
       });
       
@@ -195,11 +200,6 @@ function getAllPosts(options) {
         return sum += item.object.plusoners.totalItems;
       }, 0
     );
-    nbOfResharersRetrieved += feedCompilation.postItems.reduce(
-      function (sum, item) {
-        return sum += item.object.resharers.totalItems;
-      }, 0
-    );
     
     // Now we have all the items, unpack them into database calls
     var updateHash = {};
@@ -220,7 +220,6 @@ function getAllPosts(options) {
         'nbOfPostsRetrieved': nbOfPostsRetrieved.toFixed(0),
         'nbOfRepliesRetrieved': nbOfRepliesRetrieved.toFixed(0),
         'nbOfPlusonersRetrieved': nbOfPlusonersRetrieved.toFixed(0),
-        'nbOfResharersRetrieved': nbOfResharersRetrieved.toFixed(0),
         'tmProcessBegan': tmProcessBegan,
       });
     });

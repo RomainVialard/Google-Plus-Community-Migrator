@@ -104,7 +104,9 @@ function getAllPosts(options) {
           Plus_.getComments({
             activityId: post.id,
           }, {
-            maxResults: 250
+            query: {
+              maxResults: 100
+            }
           }, false)
         );
 //        feedCompilation.requests.push(
@@ -112,7 +114,9 @@ function getAllPosts(options) {
 //            activityId: post.id,
 //            collection: 'resharers'
 //          }, {
-//            maxResults: 100
+//            query: {
+//              maxResults: 100
+//            }
 //          }, false)
 //        );
         feedCompilation.requests.push(
@@ -120,7 +124,9 @@ function getAllPosts(options) {
             activityId: post.id,
             collection: 'plusoners'
           }, {
-            maxResults: 250
+            query: {
+              maxResults: 100
+            }
           }, false)
         );
       });

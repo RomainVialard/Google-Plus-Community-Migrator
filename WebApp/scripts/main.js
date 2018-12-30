@@ -209,6 +209,18 @@ signInButtonElement.addEventListener('click', signIn);
 // initialize Firebase
 initFirebaseAuth();
 
+// update page / site title with value in Firebase
+firebase.database().ref("siteTitle").once('value').then(function(snapshot) {
+  if(snapshot.val()) {
+    var siteTitle = snapshot.val();
+    document.title = siteTitle;
+    document.querySelector('meta[name="description"]').setAttribute("content", siteTitle);
+    document.querySelector('meta[name="application-name"]').setAttribute("content", siteTitle);
+    document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", siteTitle);
+    document.getElementsByTagName('h3')[0].innerText = siteTitle;
+  }
+});
+
 let referenceToOldestPost = '';
 let nbOfPostsDisplayed = 0;
 

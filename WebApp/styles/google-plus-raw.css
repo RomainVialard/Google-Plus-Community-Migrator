@@ -940,6 +940,132 @@ img {
   src: url(//fonts.gstatic.com/s/materialiconsextended/v42/kJEjBvgX7BgnkSrUwT8UnLVc38YydejYY-oE_LvJ.woff2)format('woff2');
 }
 
+/* Number of comments */
+.GA5Ak {
+  margin: 12px 8px -12px
+}
+
+.U26fgb.u3bW4e {
+  outline: 1px solid transparent
+}
+
+.O0WRkf {
+  -webkit-user-select: none;
+  -webkit-transition: background .2s .1s;
+  transition: background .2s .1s;
+  border: 0;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 4em;
+  outline: none;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 0
+}
+
+.O0WRkf.u3bW4e .ZFr60d {
+  background-color: rgba(0,0,0,0.12)
+}
+
+.O0WRkf.qs41qe .Vwe4Vb {
+  -webkit-transform: translate(-50%,-50%) scale(2.2);
+  transform: translate(-50%,-50%) scale(2.2);
+  opacity: 1;
+  visibility: visible
+}
+
+.O0WRkf.qs41qe.M9Bg4d .Vwe4Vb {
+  -webkit-transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  -webkit-transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1)
+}
+
+.O0WRkf.j7nIZb .Vwe4Vb {
+  -webkit-transform: translate(-50%,-50%) scale(2.2);
+  transform: translate(-50%,-50%) scale(2.2);
+  visibility: visible
+}
+
+.O0WRkf.RDPZE {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  color: rgba(68,68,68,0.502);
+  cursor: default;
+  fill: rgba(68,68,68,0.502)
+}
+
+.kHssdc.O0WRkf.C0oVfc,.XfpsVe .O0WRkf.C0oVfc {
+  min-width: 64px
+}
+
+.oG5Srb .Vwe4Vb,.zZhnYe .Vwe4Vb {
+  background-image: radial-gradient(circle farthest-side,rgba(0,0,0,0.12),rgba(0,0,0,0.12) 80%,rgba(0,0,0,0) 100%)
+}
+
+.C0oVfc {
+  line-height: 20px;
+  min-width: 88px
+}
+
+.C0oVfc .RveJvd {
+  margin: 8px
+}
+
+.kHssdc.O0WRkf.C0oVfc,.XfpsVe .O0WRkf.C0oVfc {
+  min-width: 64px
+}
+
+.xT6uNc .ZFr60d,.xT6uNc .C0oVfc,.L0uubb .ZFr60d,.L0uubb .C0oVfc {
+  min-width: 0
+}
+
+.HKdIKd {
+  color: #2962ff;
+  font-size: 12px;
+  font-weight: normal
+}
+
+.mUbCce.qs41qe.M9Bg4d .VTBa7b {
+  -webkit-transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  -webkit-transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1)
+}
+
+.XHsn7e.qs41qe.M9Bg4d>.HRp7vf {
+  -webkit-transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: -webkit-transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  -webkit-transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1);
+  transition: transform .3s cubic-bezier(0.0,0.0,0.2,1),opacity .2s cubic-bezier(0.0,0.0,0.2,1)
+}
+
+.CwaK9 {
+  position: relative
+}
+
+.RveJvd {
+  display: inline-block;
+  margin: .5em
+}
+
+.nRKLp.dm7YTc .snByac {
+  color: rgba(255,255,255,0.38)
+}
+
+.LGhJhe .zHQkBf,.LGhJhe .snByac {
+  padding-left: 16px;
+  width: 100%
+}
+
+
 /* Comments preview */
 
 .CKe11d {

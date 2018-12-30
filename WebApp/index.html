@@ -66,7 +66,19 @@
 
   <main class="mdl-layout__content mdl-color--grey-100">
 
+
+
     <div id="posts-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
+
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <select class="mdl-textfield__input" id="sortMethod" name="sortMethod" onChange="reloadPosts()">
+          <option value="published" selected>By publication date</option>
+          <option value="object/replies/totalItems">By number of comments</option>
+          <option value="object/plusoners/totalItems">By number of plusoners</option>
+          <option value="object/resharers/totalItems">By number of resharers</option>
+        </select>
+        <label class="mdl-textfield__label" for="sortMethod">Sort</label>
+      </div>
 
       <div id="posts">
         <template>
@@ -141,6 +153,13 @@
 
                 <div class="CKe11d" role="button" tabindex="0" aria-label="View comments" onclick="displayAllComments(this)">
                   <div aria-hidden="true">
+
+                    <div class="GA5Ak" style="display:none">
+                      <div role="button" class="U26fgb O0WRkf oG5Srb C0oVfc HKdIKd M9Bg4d" aria-disabled="false" tabindex="0">
+                        <div class="Vwe4Vb MbhUzd"></div><div class="ZFr60d CeoRYc"></div>
+                        <content class="CwaK9"><span class="RveJvd snByac"></span></content>
+                      </div>
+                    </div>
 
                     <!-- Preview of comments, showing only the beginning of the last 3 comments -->
                     <div class="EMg45">

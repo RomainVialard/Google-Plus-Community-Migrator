@@ -4,7 +4,7 @@
     ".write": false,
 
     "posts": {
-      ".indexOn": ["published"],
+      ".indexOn": ["published", "object/replies/totalItems", "object/plusoners/totalItems", "object/resharers/totalItems"],
 
       "$post_id": {
 
@@ -19,7 +19,7 @@
           "id": {}, // The ID of the actor's Person resource.
           "image": { // The image representation of the actor.
             "url": {} // The URL of the actor's profile photo. To resize the image and crop it to a square,
-                      // append the query string ?sz=x, where x is the dimension in pixels of each side.
+            // append the query string ?sz=x, where x is the dimension in pixels of each side.
           },
           "url": {}, // The link to the actor's Google profile.
           "verification": {}
@@ -31,7 +31,7 @@
 
         "object": { // The object of this activity.
           "actor": {}, // If this activity's object is itself another activity, such as when a person reshares an activity,
-                       // this property specifies the original activity's actor.
+          // this property specifies the original activity's actor.
           "attachments": {}, // The media objects attached to this activity.
           "content": {}, // The HTML-formatted content, which is suitable for display.
           "objectType": {},

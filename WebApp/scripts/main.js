@@ -49,7 +49,8 @@ function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
 
-let referenceToOldestKey = '';
+let referenceToLastValue = '';
+let referenceToLastKey = undefined;
 
 function loadPosts() {
   // Display a message to the user using a Toast.
@@ -57,24 +58,57 @@ function loadPosts() {
     message: nbOfPostsDisplayed + ' posts displayed. Loading more posts...',
     timeout: 1500
   };
-  if (snackbarElement && snackbarElement.MaterialSnackbar) snackbarElement.MaterialSnackbar.showSnackbar(data);
+  if (nbOfPostsDisplayed && snackbarElement && snackbarElement.MaterialSnackbar) {
+    snackbarElement.MaterialSnackbar.showSnackbar(data);
+  }
+
+  var sortMethod = document.getElementById("sortMethod").value;
 
   var callback = function(snap) {
     var postId = snap.key;
     var postData = snap.val();
     displayPost(postId, postData);
-    if (!referenceToOldestKey || new Date(referenceToOldestKey).getTime() > new Date(postData.published).getTime()) {
-      referenceToOldestKey = postData.published;
+
+    if (!referenceToLastKey) {
+      referenceToLastKey = postId;
+      switch(sortMethod) {
+        case "object/replies/totalItems":
+          referenceToLastValue = postData.object.replies.totalItems;
+          break;
+        case "object/plusoners/totalItems":
+          referenceToLastValue = postData.object.plusoners.totalItems;
+          break;
+        case "object/resharers/totalItems":
+          referenceToLastValue = postData.object.resharers.totalItems;
+          break;
+        default:
+          // published
+          referenceToLastValue = postData.published;
+      }
     }
   };
-
-  var query = firebase.database().ref('/posts/').orderByChild('published');
-  if (referenceToOldestKey) {
+  var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
+  if (referenceToLastValue) {
     // retrieve 10 additional posts + the last one previously retrieved: 11
-    query = query.limitToLast(11).endAt(referenceToOldestKey);
+    query = query.limitToLast(11).endAt(referenceToLastValue, referenceToLastKey);
   }
   else query = query.limitToLast(10);
   query.on('child_added', callback);
+  referenceToLastKey = undefined;
+}
+
+// remove all existing posts when user performs a search / sort
+// then reload them from Firebase
+function reloadPosts() {
+  var postList = document.getElementById("posts");
+  while (postList.lastChild.tagName != "TEMPLATE") {
+    postList.removeChild(postList.lastChild);
+  }
+  referenceToLastKey = '';
+  referenceToLastValue = '';
+  referenceToOldestPost = '';
+  nbOfPostsDisplayed = 0;
+  loadPosts();
 }
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
@@ -177,6 +211,11 @@ function displayPost(postId, postData) {
 
   // COMMENTS
   if (postData.object.replies.totalItems) {
+    if (postData.object.replies.totalItems > 3) {
+      div.querySelector('.GA5Ak').style.display = "block";
+      div.querySelector('.CwaK9').firstChild.innerText = "Show all " + postData.object.replies.totalItems + " comments";
+    }
+
     var commentSection = div.querySelector('.EMg45');
     var path = '/comments/' + postId;
     var query = firebase.database().ref(path).orderByChild('published').limitToLast(3);

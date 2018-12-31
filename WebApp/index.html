@@ -1,286 +1,298 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="G+ Community">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>G+ Community</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="G+ Community">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>G+ Community</title>
 
-  <!-- Disable tap highlight on IE -->
-  <meta name="msapplication-tap-highlight" content="no">
+        <!-- Disable tap highlight on IE -->
+        <meta name="msapplication-tap-highlight" content="no">
 
-  <!-- Web Application Manifest -->
-  <link rel="manifest" href="manifest.json">
+        <!-- Web Application Manifest -->
+        <link rel="manifest" href="manifest.json">
 
-  <!-- Add to homescreen for Chrome on Android -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="G+ Community">
-  <meta name="theme-color" content="#303F9F">
+        <!-- Add to home-screen for Chrome on Android -->
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="G+ Community">
+        <meta name="theme-color" content="#303F9F">
 
-  <!-- Add to homescreen for Safari on iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="G+ Community">
-  <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
+        <!-- Add to home-screen for Safari on iOS -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="G+ Community">
+        <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
 
-  <!-- Tile icon for Win8 -->
-  <meta name="msapplication-TileColor" content="#3372DF">
-  <meta name="msapplication-navbutton-color" content="#303F9F">
+        <!-- Tile icon for Win8 -->
+        <meta name="msapplication-TileColor" content="#3372DF">
+        <meta name="msapplication-navbutton-color" content="#303F9F">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-  <!-- Material Design Lite -->
-  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-  <!-- Small edit of official css for better resizing on mobile -->
-  <link rel="stylesheet" href="styles/material.blue_grey-red.css">
+        <!-- Material Design Lite -->
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        
+        <!-- Small edit of official CSS for better resizing on mobile -->
+        <link rel="stylesheet" href="styles/material.blue_grey-red.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 
-  <!-- App Styling -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-  <link rel="stylesheet" href="styles/main.css">
-  <link rel="stylesheet" href="styles/google-plus-raw.css">
-</head>
-<body>
-<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <!-- App Styling -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/google-plus-raw.css">
+    </head>
+    <body>
 
-  <!-- Header section containing logo -->
-  <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
-    <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
-      <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-        <h3>G+ Community</h3>
-      </div>
-      <div id="user-container">
-        <div hidden id="user-pic"></div>
-        <div hidden id="user-name"></div>
-        <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-          Sign-out
-        </button>
-        <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-          <i class="material-icons">account_circle</i>Sign-in with Google
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="mdl-layout__content mdl-color--grey-100">
-
-
-
-    <div id="posts-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
-
-      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <select class="mdl-textfield__input" id="sortMethod" name="sortMethod" onChange="reloadPosts()">
-          <option value="published" selected>By publication date</option>
-          <option value="object/replies/totalItems">By number of comments</option>
-          <option value="object/plusoners/totalItems">By number of plusoners</option>
-          <option value="object/resharers/totalItems">By number of resharers</option>
-        </select>
-        <label class="mdl-textfield__label" for="sortMethod">Sort</label>
-      </div>
-
-      <div id="posts">
-        <template>
-          <!--Template for posts - copied from Google+ to match css classes-->
-          <div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-cell--5-col">
-            <div class="OisWG">
-              <div class="tpVlOc mEgM8 iCPjVb hE2QI">
-                <span class="h7vvy jfZVid"><img class="MqU2J" height="36" width="36"></span>
-                <div class="dVAtqc" id="author:c30">
-                  <div class="q6HYG">
-                    <div class="mmkmJ"><span class="sXku1c"></span></div>
-                    <div class="dNF4Ud pSkmb">
-                      <div class="XVzU0b pdkqBe tFHtob">
-                        <svg height="100%" width="100%">
-                          <path d="M20 14l10 10-10 10z"></path>
-                        </svg>
-                      </div>
-                      <div class="UohHvc"><span class="eYSPjc IJ13Ic"></span></div>
-                      <span class="HiU1rc" aria-hidden="true"></span>
-                    </div>
-                  </div>
-                  <div class="GmZGge">
-                    <div class="BIDenb">
-                      <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="eZ8gzf" aria-label="Full post view"><span class="DPvwYc rRPL7d" aria-hidden="true">?</span></a>
-                      <div class="LmajHd n8JNod">
-                        <div role="button" class="U26fgb JRtysb WzwrXb iRxCkb lrZTuc" aria-label="More options" aria-disabled="false" tabindex="0" aria-haspopup="true" aria-expanded="false" data-dynamic="true" data-alignright="true">
-                          <div class="NWlf3e MbhUzd"></div>
-                          <content class="MhXXcc oJeWuf"><span class="Lw7GHd snByac"><span class="DPvwYc NKEypf SnosMe" aria-hidden="true">?</span></span></content>
-                        </div>
-                      </div>
-                    </div>
-                    <span class="o8gkze"></span>
-                  </div>
+        <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            
+            <!-- Header section containing logo -->
+            <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+              <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+                <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+                  <h3>G+ Community</h3>
+                </div>
+                <div id="user-container">
+                  <div hidden id="user-pic"></div>
+                  <div hidden id="user-name"></div>
+                  <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                    Sign-out
+                  </button>
+                  <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                    <i class="material-icons">account_circle</i>Sign-in with Google
+                  </button>
                 </div>
               </div>
-              <span class="Sce4ed">
-                <div class="uVccjd t9tmff" data-checked-veid="46456" data-unchecked-veid="46457" aria-label="Select this post" tabindex="0" role="checkbox" aria-checked="false">
-                   <div class="PkgjBf MbhUzd"></div>
-                   <div class="uHMk6b fsHoPb"></div>
-                   <div class="rq8Mwb">
-                      <div class="TCA6qd">
-                         <div class="MbUTNc oyD5Oc"></div>
-                         <div class="Ii6cVc oyD5Oc"></div>
-                      </div>
-                   </div>
-                </div>
-            </span>
-            </div>
-            <div class="SlwI7e">
-              <div>
-                <div class="i8Zvz">
-                  <div class="R6Ozpf qhIQqf" onclick="expandPost(this)">
-                    <div class="jVjeQd" dir="ltr"></div>
-                  </div>
-                </div>
-                <div class="i8Zvz"></div>
-
-                <!-- Picture linked to post -->
-                <div data-jsname="MTOxpb" style="display:none">
-                  <div jscontroller="T4Un2e">
-                    <div class="e8zLFb">
-                      <div class="uvi9me">
-                        <div class="ZC69kc">
-                          <div class="E68jgf" style="padding-top: 48.68%">
-                            <img class="JZUAbb" alt="Photo">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="CKe11d" role="button" tabindex="0" aria-label="View comments" onclick="displayAllComments(this)">
-                  <div aria-hidden="true">
-
-                    <div class="GA5Ak" style="display:none">
-                      <div role="button" class="U26fgb O0WRkf oG5Srb C0oVfc HKdIKd M9Bg4d" aria-disabled="false" tabindex="0">
-                        <div class="Vwe4Vb MbhUzd"></div><div class="ZFr60d CeoRYc"></div>
-                        <content class="CwaK9"><span class="RveJvd snByac"></span></content>
-                      </div>
+            </header>
+            
+            <!-- Main content section -->
+            <main class="mdl-layout__content mdl-color--grey-100">
+                <div id="posts-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
+                    
+                    <!-- Sorting Method -->
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <select class="mdl-textfield__input" id="sortMethod" name="sortMethod" onChange="reloadPosts()">
+                            <option value="published" selected>By publication date</option>
+                            <option value="object/replies/totalItems">By number of comments</option>
+                            <option value="object/plusoners/totalItems">By number of plusones</option>
+                            <option value="object/resharers/totalItems">By number of reshares</option>
+                        </select>
+                        <label class="mdl-textfield__label" for="sortMethod">Sort</label>
                     </div>
 
-                    <!-- Preview of comments, showing only the beginning of the last 3 comments -->
-                    <div class="EMg45">
+                    <!-- Posts -->
+                    <div id="posts">
                       <template>
-                        <div class="X865Z">
-                          <div class="SVRkP"><span class="vGowKb" aria-label="Commenter name"></span><span class="Wj5EM">: <span aria-label="Comment"></span></span></div>
-                        </div>
-                      </template>
-                    </div>
-
-                    <!-- Full comments list -->
-                    <div class="RIrM6d" aria-label="Comments" style="display:none">
-                      <ul class="AarIR dYuyre fFUsIf">
-                        <template>
-                          <li class="OnSI9b BCNiN XkfHGe" tabindex="-1">
-                            <span class="h7vvy oFkD6c"><img class="MqU2J" height="36" width="36" src=""></span>
-                            <div class="PGAhe" role="heading" aria-level="3">
-                              <div class="kCYXq"><span class="vGowKb"></span><span class="iOAN1d"></span></div>
-                              <div class="g6UaYd">
-                                <!-- comment -->
-                                <div></div>
+                        
+                        <!--Template for posts - copied from Google+ to match CSS classes-->
+                        <div class="mvhxEe wRd1We cDhoub XkfHGe hE2QI mdl-cell mdl-cell--4-col">
+                          <div class="OisWG">
+                            <div class="tpVlOc mEgM8 iCPjVb hE2QI">
+                              <span class="h7vvy jfZVid"><img class="MqU2J" height="36" width="36"></span>
+                              <div class="dVAtqc" id="author:c30">
+                                <div class="q6HYG">
+                                  <div class="mmkmJ"><span class="sXku1c"></span></div>
+                                  <div class="dNF4Ud pSkmb">
+                                    <div class="XVzU0b pdkqBe tFHtob">
+                                      <svg height="100%" width="100%">
+                                        <path d="M20 14l10 10-10 10z"></path>
+                                      </svg>
+                                    </div>
+                                    <div class="UohHvc"><span class="eYSPjc IJ13Ic"></span></div>
+                                    <span class="HiU1rc" aria-hidden="true"></span>
+                                  </div>
+                                </div>
+                                <div class="GmZGge">
+                                  <div class="BIDenb">
+                                    <a href="./+JMuller/posts/Ws7KGV7hn9Z" class="eZ8gzf" aria-label="Full post view"><span class="DPvwYc rRPL7d" aria-hidden="true">?</span></a>
+                                    <div class="LmajHd n8JNod">
+                                      <div role="button" class="U26fgb JRtysb WzwrXb iRxCkb lrZTuc" aria-label="More options" aria-disabled="false" tabindex="0" aria-haspopup="true" aria-expanded="false" data-dynamic="true" data-alignright="true">
+                                        <div class="NWlf3e MbhUzd"></div>
+                                            
+                                            <content class="MhXXcc oJeWuf"><span class="Lw7GHd snByac"><span class="DPvwYc NKEypf SnosMe" aria-hidden="true">?</span></span></content>
+                                            
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <span class="o8gkze"></span>
+                                </div>
                               </div>
                             </div>
-                            <div class="Ahjhqf MtqTje">
-                              <div class="gmFStc"><span></span></div>
-                            </div>
-                          </li>
-                        </template>
-                      </ul>
-                    </div>
 
-                  </div>
-                </div>
+                            <span class="Sce4ed">
+                              <div class="uVccjd t9tmff" data-checked-veid="46456" data-unchecked-veid="46457" aria-label="Select this post" tabindex="0" role="checkbox" aria-checked="false">
+                                 <div class="PkgjBf MbhUzd"></div>
+                                 <div class="uHMk6b fsHoPb"></div>
+                                 <div class="rq8Mwb">
+                                    <div class="TCA6qd">
+                                       <div class="MbUTNc oyD5Oc"></div>
+                                       <div class="Ii6cVc oyD5Oc"></div>
+                                    </div>
+                                 </div>
+                              </div>
+                          </span>
 
-                <div class="QeQGL">
-                  <div data-fh="false" data-sc="true" class="SVDMFb VrClg">
-                    <div class="pf7Psf kQxXGc tgi2ee" data-c="google-plus" data-si="14" data-av="true">
-                      <content class="x2sGwe aRDqpc">
-                        <div>
-                          <div class="JPtOFc">
-                            <img class="WWCMIb vD3nIe" width="36" height="36">
-                            <div class="QBU0S PnFuuf">
-                              <div class="L0Slxe" tabindex="0" role="button">Add a comment...</div>
+                          </div>
+                          
+                          <div class="SlwI7e">
+                            <div>
+                              <div class="i8Zvz">
+                                <div class="R6Ozpf qhIQqf" onclick="expandPost(this)">
+                                  <div class="jVjeQd" dir="ltr"></div>
+                                </div>
+                              </div>
+                              <div class="i8Zvz"></div>
+
+                              <!-- Picture linked to post -->
+                              <div data-jsname="MTOxpb" style="display:none">
+                                <!-- <div jscontroller="T4Un2e"> -->
+                                <div>
+                                  <div class="e8zLFb">
+                                    <div class="uvi9me">
+                                      <div class="ZC69kc">
+                                        <div class="E68jgf" style="padding-top: 48.68%">
+                                          <img class="JZUAbb" alt="Photo">
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="CKe11d" role="button" tabindex="0" aria-label="View comments" onclick="displayAllComments(this)">
+                                <div aria-hidden="true">
+
+                                  <div class="GA5Ak" style="display:none">
+                                    <div role="button" class="U26fgb O0WRkf oG5Srb C0oVfc HKdIKd M9Bg4d" aria-disabled="false" tabindex="0">
+                                      <div class="Vwe4Vb MbhUzd"></div><div class="ZFr60d CeoRYc"></div>
+                                      <content class="CwaK9"><span class="RveJvd snByac"></span></content>
+                                    </div>
+                                  </div>
+
+                                  <!-- Preview of comments, showing only the beginning of the last 3 comments -->
+                                  <div class="EMg45">
+                                    <template>
+                                      <div class="X865Z">
+                                        <div class="SVRkP"><span class="vGowKb" aria-label="Commenter name"></span><span class="Wj5EM">: <span aria-label="Comment"></span></span></div>
+                                      </div>
+                                    </template>
+                                  </div>
+
+                                  <!-- Full comments list -->
+                                  <div class="RIrM6d" aria-label="Comments" style="display:none">
+                                    <ul class="AarIR dYuyre fFUsIf">
+                                      <template>
+                                        <li class="OnSI9b BCNiN XkfHGe" tabindex="-1">
+                                          <span class="h7vvy oFkD6c"><img class="MqU2J" height="36" width="36" src=""></span>
+                                          <div class="PGAhe" role="heading" aria-level="3">
+                                            <div class="kCYXq"><span class="vGowKb"></span><span class="iOAN1d"></span></div>
+                                            <div class="g6UaYd">
+                                              <!-- comment -->
+                                              <div></div>
+                                            </div>
+                                          </div>
+                                          <div class="Ahjhqf MtqTje">
+                                            <div class="gmFStc"><span></span></div>
+                                          </div>
+                                        </li>
+                                      </template>
+                                    </ul>
+                                  </div>
+
+                                </div>
+                              </div>
+                              
+                              <div class="QeQGL">
+                                <div data-fh="false" data-sc="true" class="SVDMFb VrClg">
+                                  <div class="pf7Psf kQxXGc tgi2ee" data-c="google-plus" data-si="14" data-av="true">
+                                    
+                                    <content class="x2sGwe aRDqpc">
+                                      <div>
+                                        <div class="JPtOFc">
+                                          <img class="WWCMIb vD3nIe" width="36" height="36">
+                                          <div class="QBU0S PnFuuf">
+                                            <div class="L0Slxe" tabindex="0" role="button">Add a comment...</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </content>
+                                    
+                                    <div class="tb3unb" style="display:none;" aria-hidden="true">
+                                      <div class="xn2mde gn1yRe">
+                                        <img class="Xy5NZc n5wdGe" src="https://ssl.gstatic.com/social/plusappui/drag_drop_overlay_3ba422a8b93491a55b6fd8e5a6f5790d.png" aria-hidden="true" alt="">
+                                        <div class="mlwXqe D5zEId">Drag photo here to add to your comment</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="b4FgKc xAPqUc" role="toolbar" aria-label="Post actions">
+                                  <div class="JzCzjd">
+
+                                    <!-- Plus Ones -->
+                                    <div data-itemid="" data-count="" data-pressed="" class="oHo9me" onclick="togglePlusoned(this)">
+                                      <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c teCjMb" aria-label="+1" aria-disabled="false" tabindex="0" aria-describedby="c31" aria-pressed="false">
+                                        <div class="VTBa7b MbhUzd"></div>
+                                        
+                                        <!-- +1 Button -->
+                                        <content class="xjKiLb">
+                                          <span style="top: -12px">
+                                             <div class="G7pzvd" style="margin-left:3px">
+                                                <svg width="100%" height="100%">
+                                                   <path class="Ce1Y1c" d="M10 8H8v4H4v2h4v4h2v-4h4v-2h-4zm4.5-1.92V7.9l2.5-.5V18h2V5z"></path>
+                                                </svg>
+                                             </div>
+                                          </span>
+                                        </content>
+                                        
+                                      </div>
+                                      <span class="cUjEhd" id="c31"> 5 plus ones</span>
+                                    </div>
+                                    <div class="M8ZOee" aria-hidden="true"></div>
+
+                                    <!-- Reshares -->
+                                    <div class="oHo9me">
+                                      <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c" aria-label="Share" aria-disabled="false" tabindex="0" aria-describedby="c32">
+                                        <div class="VTBa7b MbhUzd"></div>
+                                        
+                                        <!-- Share Button -->
+                                        <content class="xjKiLb">
+                                          <span style="top: -12px">
+                                             <div class="XVzU0b G7pzvd pdkqBe">
+                                                <svg height="100%" width="100%">
+                                                   <path class="Ce1Y1c" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7 l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"></path>
+                                                </svg>
+                                             </div>
+                                          </span>
+                                        </content>
+                                        
+                                      </div>
+                                      <span class="cUjEhd" id="c32"> no shares</span>
+                                    </div>
+                                    <div class="M8ZOee" aria-hidden="true"></div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </content>
-                      <div class="tb3unb" style="display:none;" aria-hidden="true">
-                        <div class="xn2mde gn1yRe">
-                          <img class="Xy5NZc n5wdGe" src="https://ssl.gstatic.com/social/plusappui/drag_drop_overlay_3ba422a8b93491a55b6fd8e5a6f5790d.png" aria-hidden="true">
-                          <div class="mlwXqe D5zEId">Drag photo here to add to your comment</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="b4FgKc xAPqUc" role="toolbar" aria-label="Post actions">
-                    <div class="JzCzjd">
+                      </template>
 
-                      <!-- Plusones -->
-                      <div data-itemid="" data-count="" data-pressed="" class="oHo9me" onclick="togglePlusoned(this)">
-                        <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c teCjMb" aria-label="+1" aria-disabled="false" tabindex="0" aria-describedby="c31" aria-pressed="false">
-                          <div class="VTBa7b MbhUzd"></div>
-                          <content class="xjKiLb">
-                            <span style="top: -12px">
-                               <div class="G7pzvd" style="margin-left:3px">
-                                  <svg width="100%" height="100%">
-                                     <path class="Ce1Y1c" d="M10 8H8v4H4v2h4v4h2v-4h4v-2h-4zm4.5-1.92V7.9l2.5-.5V18h2V5z"></path>
-                                  </svg>
-                               </div>
-                            </span>
-                          </content>
-                        </div>
-                        <span class="cUjEhd" id="c31"> 5 plus ones</span>
-                      </div>
-                      <div class="M8ZOee" aria-hidden="true"></div>
-
-                      <!-- Reshares -->
-                      <div class="oHo9me">
-                        <div role="button" class="U26fgb mUbCce fKz7Od GsLz7c" aria-label="Share" aria-disabled="false" tabindex="0" aria-describedby="c32">
-                          <div class="VTBa7b MbhUzd"></div>
-                          <content class="xjKiLb">
-                            <span style="top: -12px">
-                               <div class="XVzU0b G7pzvd pdkqBe">
-                                  <svg height="100%" width="100%">
-                                     <path class="Ce1Y1c" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7 l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"></path>
-                                  </svg>
-                               </div>
-                            </span>
-                          </content>
-                        </div>
-                        <span class="cUjEhd" id="c32"> no shares</span>
-                      </div>
-                      <div class="M8ZOee" aria-hidden="true"></div>
                     </div>
-                  </div>
+
+                    <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+                        <div class="mdl-snackbar__text"></div>
+                        <button class="mdl-snackbar__action" type="button"></button>
+                    </div>
+
                 </div>
-              </div>
-            </div>
-        </template>
-
-      </div>
-    </div>
-
-    <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
-      <div class="mdl-snackbar__text"></div>
-      <button class="mdl-snackbar__action" type="button"></button>
-    </div>
-
-  </main>
-</div>
-
-<!-- Import and configure the Firebase SDK -->
-<!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
-<!-- If you do not want to serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-<script src="/__/firebase/5.5.3/firebase-app.js"></script>
-<script src="/__/firebase/5.5.3/firebase-auth.js"></script>
-<script src="/__/firebase/5.5.3/firebase-database.js"></script>
-<script src="/__/firebase/5.5.3/firebase-storage.js"></script>
-<script src="/__/firebase/5.5.3/firebase-messaging.js"></script>
-<script src="/__/firebase/init.js"></script>
-
-<script src="scripts/main.js"></script>
-</body>
+            </main>
+        </div>
+        <script src="/__/firebase/5.7.1/firebase-app.js"></script>
+        <script src="/__/firebase/5.7.1/firebase-auth.js"></script>
+        <script src="/__/firebase/5.7.1/firebase-database.js"></script>
+        <script src="/__/firebase/5.7.1/firebase-storage.js"></script>
+        <script src="/__/firebase/5.7.1/firebase-messaging.js"></script>
+        <script src="/__/firebase/init.js"></script>
+        <script src="scripts/main.js"></script>
+    </body>
 </html>

@@ -27,8 +27,8 @@ main {
   margin-top: 17px;
 }
 .mdl-grid {
-  max-width: 1024px;
   margin: auto;
+  width: 90%;
 }
 .material-icons {
   font-size: 36px;

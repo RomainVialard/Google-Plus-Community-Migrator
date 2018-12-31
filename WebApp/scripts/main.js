@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* global firebase */
+
 'use strict';
 
 // Signs-in Friendly Chat.
@@ -101,7 +104,7 @@ function loadPosts() {
 // then reload them from Firebase
 function reloadPosts() {
   var postList = document.getElementById("posts");
-  while (postList.lastChild.tagName != "TEMPLATE") {
+  while (postList.lastChild.tagName !== "TEMPLATE") {
     postList.removeChild(postList.lastChild);
   }
   referenceToLastKey = '';
@@ -327,7 +330,7 @@ function togglePlusoned(el) {
   var userGoogleId = firebase.auth().currentUser.providerData[0].uid;
 
   var subEl = el.querySelector('[aria-label="+1"]');
-  if (el.dataset.pressed == "true") {
+  if (el.dataset.pressed === "true") {
     el.dataset.pressed = false;
     el.dataset.count--;
 

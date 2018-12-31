@@ -209,6 +209,11 @@ function displayPost(postId, postData) {
     div.querySelector('.JPtOFc').style.display = 'none';
   }
 
+  // RESHARES
+  if (postData.object.resharers.totalItems) {
+    div.querySelectorAll('.M8ZOee')[1].textContent = postData.object.resharers.totalItems;
+  }
+
   // COMMENTS
   if (postData.object.replies.totalItems) {
     if (postData.object.replies.totalItems > 3) {

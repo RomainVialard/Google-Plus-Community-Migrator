@@ -43,7 +43,7 @@ function getAllPosts() {
   var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
   
   do {
-    var activityFeed = Plus.Activities.search(searchQuery, {pageToken: nextPageToken});
+    var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
     var posts = activityFeed.items;
     nextPageToken = activityFeed.nextPageToken;
     if (!posts.length) nextPageToken = null;
@@ -56,7 +56,7 @@ function getAllPosts() {
 
       // retrieve comments
       var comments = ErrorHandler.expBackoff(function(){
-        return Plus.Comments.list(postId).items;
+        return Plus.Comments.list(postId, {maxResults: 500}).items;
       });
       if (comments) {
         if (comments instanceof Error) {
@@ -73,7 +73,7 @@ function getAllPosts() {
 
       // retrieve plusoners
       var plusoners = ErrorHandler.expBackoff(function(){
-        return Plus.People.listByActivity(postId, "plusoners").items;
+        return Plus.People.listByActivity(postId, "plusoners", {maxResults: 100}).items;
       });
       if (plusoners) {
         if (plusoners instanceof Error) {
@@ -88,7 +88,8 @@ function getAllPosts() {
         }
       }
       
-      // retrieve resharers      
+      // retrieve resharers - doesn't seem to work
+      /*
       var resharers = ErrorHandler.expBackoff(function(){
         return Plus.People.listByActivity(postId, "resharers").items;
       });
@@ -104,6 +105,8 @@ function getAllPosts() {
           }
         }
       }
+      */
+
       // Firebase multi-location updates
       fb.updateData('', postData);
     }

@@ -1,5 +1,6 @@
 function getAllPosts() {
 
+  var triggerInterval = 30; // in minutes; value 5 exceeded to default quota.
   var projectId = "apps-script-community-archive";
   var communityId = "102471985047225101769";
   var searchQuery = "community:" + communityId;
@@ -24,7 +25,7 @@ function getAllPosts() {
   // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (!triggers.length) {
-    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(triggerInterval).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     scriptProperties.setProperty("lastSyncDate", today);

@@ -1,11 +1,8 @@
-var FIREBASEURL = "https://brainysmurf-gplus-community.firebaseio.com/";
-var COMMUNITYID = "102471985047225101769";
+var FIREBASEURL = "<your firebase url here>";
+var COMMUNITYID = "<community id here>";
 
 function App_ (options) {
   this.options = options || {};
-  if (this.options.debug) {
-    Import.FormatLogger.init();
-  }
   if (!options.firebaseUrl || !options.communityId) throw Error("Parameters required");
   this.firebaseBaseUrl = options.firebaseUrl;
   this.communityId = options.communityId;
@@ -109,10 +106,10 @@ function App_ (options) {
       }, this.options.errorHandlerOptions);
             
       if (activityFeed instanceof Error) {
-        if (activityFeed.message == "Daily Limit Exceeded")
+        if (activityFeed.message == ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED)
           throw new HitRateReached(activityFeed.message);
-        else if (activityFeed.message.match(/.*cannot be used for API calls.*/)) {
-          throw new GooglePlusApiNotEnabled(activityFeed.message);
+        else if (activityFeed.message == ErrorHandler.NORMALIZED_ERRORS.API_NOT_ENABLED) {
+          throw new GooglePlusApiNotEnabled(activityFeed.context.originalMessage);  // not just message, because the context.originalMessage has a useful link
         }
         throw new UnexpectedError(activityFeed.message);
       }
@@ -194,8 +191,8 @@ function App_ (options) {
       });
       
       if (responses instanceof Error) {
-        if (responses.message == 'Daily Limit Exceeded') throw new HitRateReached('while doing batch request');
-        else throw new UnexpectedError(responses.message);
+        if (responses.message == ErrorHandler.NORMALIZED_ERRORS.DAILY_LIMIT_EXCEEDED) throw new HitRateReached('while doing batch request');
+        else throw new UnexpectedError( (responses.context || {originalMessage: responses.message}).originalMessage);  // .context.originalMessage if present, otherwise fallback to just .message
       }
       
       responses.forEach(
@@ -303,7 +300,6 @@ function App_ (options) {
         this.batchRequests();
         this.count(this.feedCompilation.postItems);
         this.save();
-        if (this.options.shortCircuit) this.done = true;
       } while (!this.done);
 
       this.inform.subject = 'Operation Complete';
@@ -351,8 +347,7 @@ function execute() {
     firebaseUrl: FIREBASEURL,
     communityId: COMMUNITYID,
     retryNumber: 3,  // for ErrorHandler, more responsive than the default 5
-    debug: true,
-    maxInnerLoopCount: 10,
+    maxInnerLoopCount: 10,  // can be increased for even better performance
   });
   app.process();
 }

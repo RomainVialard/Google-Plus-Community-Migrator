@@ -157,7 +157,7 @@ function App_ (options) {
             collection: 'plusoners',
           }, {
             query: {
-              maxResults: 10,
+              maxResults: 100,
               fields: 'kind,nextPageToken,items'
           }}, false)
         );

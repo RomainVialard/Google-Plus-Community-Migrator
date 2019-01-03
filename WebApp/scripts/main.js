@@ -1,120 +1,101 @@
-/**
- * Copyright 2018 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* global firebase */
 
 'use strict';
 
-// Signs-in Friendly Chat.
+// Sign in Firebase using popup auth and Google as the identity provider.
 function signIn() {
-  // Sign in Firebase using popup auth and Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider);
 }
 
-// Signs-out of Friendly Chat.
+// Sign out of Firebase.
 function signOut() {
-  // Sign out of Firebase.
-  firebase.auth().signOut();
+    firebase.auth().signOut();
 }
 
-// Initiate firebase auth.
-function initFirebaseAuth() {
   // Listen to auth state changes.
-  firebase.auth().onAuthStateChanged(authStateObserver);
+function initFirebaseAuth() {
+    firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
 // Returns the signed-in user's profile Pic URL.
 function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
+    return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
 }
 
 // Returns the signed-in user's display name.
 function getUserName() {
-  return firebase.auth().currentUser.displayName;
+    return firebase.auth().currentUser.displayName;
 }
 
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
-  return !!firebase.auth().currentUser;
+    return !!firebase.auth().currentUser;
 }
 
 let referenceToLastValue = '';
 let referenceToLastKey = undefined;
 
+
 function loadPosts() {
-  // Display a message to the user using a Toast.
-  var data = {
-    message: nbOfPostsDisplayed + ' posts displayed. Loading more posts...',
-    timeout: 1500
-  };
-  if (nbOfPostsDisplayed && snackbarElement && snackbarElement.MaterialSnackbar) {
-    snackbarElement.MaterialSnackbar.showSnackbar(data);
-  }
 
-  var sortMethod = document.getElementById("sortMethod").value;
-
-  var callback = function(snap) {
-    var postId = snap.key;
-    var postData = snap.val();
-    displayPost(postId, postData);
-
-    if (!referenceToLastKey) {
-      referenceToLastKey = postId;
-      switch(sortMethod) {
-        case "object/replies/totalItems":
-          referenceToLastValue = postData.object.replies.totalItems;
-          break;
-        case "object/plusoners/totalItems":
-          referenceToLastValue = postData.object.plusoners.totalItems;
-          break;
-        case "object/resharers/totalItems":
-          referenceToLastValue = postData.object.resharers.totalItems;
-          break;
-        default:
-          // published
-          referenceToLastValue = postData.published;
-      }
+    var sortMethod = document.getElementById("sortMethod").value;
+    var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
+  
+    if (referenceToLastValue) {
+        // retrieve 1 additional posts + the last one previously retrieved: 11
+        query = query.limitToLast(11).endAt(referenceToLastValue, referenceToLastKey);
+    } else {
+        query = query.limitToLast(10);
     }
-  };
-  var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
-  if (referenceToLastValue) {
-    // retrieve 10 additional posts + the last one previously retrieved: 11
-    query = query.limitToLast(11).endAt(referenceToLastValue, referenceToLastKey);
-  }
-  else query = query.limitToLast(10);
-  query.on('child_added', callback);
+  
+    query.on('child_added', function(snapshot) {
+        var postId = snapshot.key;
+        var postData = snapshot.val();
+        displayPost(postId, postData);
+        if (! referenceToLastKey) {
+            referenceToLastKey = postId;
+            switch(sortMethod) {
+                case "object/replies/totalItems":
+                  referenceToLastValue = postData.object.replies.totalItems;
+                  break;
+                case "object/plusoners/totalItems":
+                  referenceToLastValue = postData.object.plusoners.totalItems;
+                  break;
+                case "object/resharers/totalItems":
+                  referenceToLastValue = postData.object.resharers.totalItems;
+                  break;
+                default:
+                  // published
+                  referenceToLastValue = postData.published;
+            }
+        }
+  });
   referenceToLastKey = undefined;
 }
 
-// remove all existing posts when user performs a search / sort
-// then reload them from Firebase
+// remove all posts when user performs a search / sort; then reload them from Firebase.
 function reloadPosts() {
-  var postList = document.getElementById("posts");
-  while (postList.lastChild.tagName !== "TEMPLATE") {
-    postList.removeChild(postList.lastChild);
-  }
-  referenceToLastKey = '';
-  referenceToLastValue = '';
-  referenceToOldestPost = '';
-  nbOfPostsDisplayed = 0;
-  loadPosts();
+    
+    /* visually remove the items from the layout */
+    var postList = document.getElementById("posts");
+    var items = postList.getElementsByClassName("grid-item");
+    
+    /* remove the items from DOM */
+    while (postList.lastChild !== null) {
+        postList.removeChild(postList.lastChild);
+    }
+    
+    referenceToLastKey = '';
+    referenceToLastValue = '';
+    referenceToOldestPost = '';
+    nbOfPostsDisplayed = 0;
+
+    loadPosts();
 }
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
+// TODO: this does not yet remove the profile picture from the posts & it also breaks the script.
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Get the signed-in user's profile pic and name.
@@ -145,17 +126,23 @@ function authStateObserver(user) {
 
 // Displays a Post in the UI.
 function displayPost(postId, postData) {
+    
   var div = document.getElementById(postId);
-  // if post was already retrieved and displayed, skip
-  if (div) return;
+  
+  // if a post was already retrieved and displayed, skip it.
+  if (div) {
+      
+      /* TODO: comment avatars & plusones would nevertheless need to be updated */
+      return false;
+  }
 
-  var template = document.getElementById("posts").querySelector("template");
+  var template = document.getElementById("template-holder").querySelector("template");
   var copy = document.importNode(template.content, true);
   div = copy.querySelector('div');
   div.id = postId;
 
-  if (!referenceToOldestPost) postListElement.appendChild(div);
-  else postListElement.insertBefore(div, referenceToOldestPost);
+  if (!referenceToOldestPost) {postListElement.appendChild(div);}
+  else {postListElement.insertBefore(div, referenceToOldestPost);}
   referenceToOldestPost = div;
   nbOfPostsDisplayed++;
 
@@ -198,16 +185,14 @@ function displayPost(postId, postData) {
         element.classList.add('y7OZL');
         element.classList.add('M9Bg4d');
         plusOnesContainer.dataset.pressed = true;
-      }
-      else {
+      } else {
         plusOnesContainer.dataset.pressed = false;
       }
     });
 
     // display the current user profile picture next to the comment UI
     div.querySelector('.WWCMIb').src = currentUser.photoURL;
-  }
-  else {
+  } else {
     // if user not authenticated, hide profile picture placeholder + comment textbox
     div.querySelector('.JPtOFc').style.display = 'none';
   }
@@ -239,7 +224,6 @@ function displayPost(postId, postData) {
       }
     });
   }
-
 }
 
 // Shortcuts to DOM Elements.
@@ -273,6 +257,7 @@ let nbOfPostsDisplayed = 0;
 
 // load the first 10 posts right away
 loadPosts();
+
 // load 10 more posts once user scrolled to the bottom of the page
 document.getElementsByTagName('main')[0].addEventListener('scroll', function(event) {
   var element = event.target;
@@ -315,15 +300,15 @@ function displayAllComments(el) {
 }
 
 function togglePlusoned(el) {
-  // check if user is authenticated. If not, display alert
+  
+  // check if user is authenticated.
   if (!firebase.auth().currentUser) {
     // Display a message to the user using a Toast.
-    var data = {
+    snackbarElement.MaterialSnackbar.showSnackbar({
       message: 'You must sign-in to +1 a post.',
       timeout: 1500
-    };
-    snackbarElement.MaterialSnackbar.showSnackbar(data);
-    return;
+    });
+    return false;
   }
 
   var postId = el.dataset.itemid.replace("update/", "");
@@ -358,9 +343,7 @@ function togglePlusoned(el) {
       displayName: firebase.auth().currentUser.displayName,
       // etag: "",
       id: userGoogleId,
-      image: {
-        url: firebase.auth().currentUser.photoURL
-      },
+      image: {url: firebase.auth().currentUser.photoURL},
       kind: "plus#person",
       url: "https://profiles.google.com/" + userGoogleId
     };

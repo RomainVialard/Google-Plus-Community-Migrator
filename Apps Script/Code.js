@@ -1,5 +1,7 @@
 function getAllPosts() {
-  var firebaseBaseUrl = "https://apps-script-community-archive.firebaseio.com/";
+
+  var triggerInterval = 30; // in minutes; value 5 exceeded to default quota.
+  var projectId = "apps-script-community-archive";
   var communityId = "102471985047225101769";
   var searchQuery = "community:" + communityId;
   // you can use as the searchQuery most advanced search features listed here:
@@ -23,7 +25,7 @@ function getAllPosts() {
   // The import will continue as soon as the quota is reset
   var triggers = ScriptApp.getProjectTriggers();
   if (!triggers.length) {
-    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(triggerInterval).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     scriptProperties.setProperty("lastSyncDate", today);
@@ -40,7 +42,7 @@ function getAllPosts() {
   }
   
   var token = ScriptApp.getOAuthToken();
-  var fb = FirebaseApp.getDatabaseByUrl(firebaseBaseUrl, token);
+  var fb = FirebaseApp.getDatabaseByUrl("https://" + projectId + ".firebaseio.com/", token);
   
   do {
     var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
@@ -138,7 +140,7 @@ function getAllPosts() {
       var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/top";
       body+= linkToSearchResultsInGooglePlus+ "<br><br>";
       body+= "If you have completed the tutorial, all those posts should be available here:<br>";
-      body+= firebaseBaseUrl.replace("firebaseio.com", "firebaseapp.com");
+      body+= ("https://" + projectId + ".firebaseapp.com/");
       body+= "<br><br>New posts will also be automatically exported every day.";
       MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
     }

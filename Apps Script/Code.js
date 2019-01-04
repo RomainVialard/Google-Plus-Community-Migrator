@@ -26,18 +26,18 @@ function App_ (options) {
       subject: "Subject",
       body: ""
     };
-    var tPB = this.fb.getData('posts/session/tmProcessBegan');
+    var tPB = this.fb.getData('meta/session/tmProcessBegan');
     if (tPB) {
       this.timeProcessBegan = new Date(tPB);
     } else {
       this.timeProcessBegan = new Date()
-      this.fb.setData('posts/session/tmProcessBegan', Utilities.formatDate(this.timeProcessBegan, "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'"));
+      this.fb.setData('meta/session/tmProcessBegan', Utilities.formatDate(this.timeProcessBegan, "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'"));
     }
     
     this.alreadySaved = [];
     
     // read in the token, if available
-    var nPT = this.fb.getData('posts/session/nextPageToken');
+    var nPT = this.fb.getData('meta/session/nextPageToken');
     if (nPT) 
       this.nextPageToken = nPT;
     else
@@ -54,7 +54,7 @@ function App_ (options) {
     posts = this.fb.getData("posts", {shallow: "true"}) || [];
     
     // count them here so we aren't doing it throughout the process
-    this.counts.totalPostsInDb = (Object.keys(posts).length - 1).toFixed(0);  // minus 1 to account for posts/session
+    this.counts.totalPostsInDb = (Object.keys(posts).length).toFixed(0);
     this.counts.totalRepliesInDb = calcNestedItems_(this.fb.getData("comments", {shallow: "false"})).toFixed(0);
     this.counts.totalPlusonersInDb = calcNestedItems_(this.fb.getData("plusoners", {shallow: "false"})).toFixed(0);
     
@@ -239,7 +239,7 @@ function App_ (options) {
     @param Array(post items)
   */
   this.count = function (arr) {
-    this.counts = this.fb.getData('posts/session/counts') || {};
+    this.counts = this.fb.getData('meta/session/counts') || {};
     this.counts.nbOfPostsRetrieved = this.counts.nbOfPostsRetrieved || 0;
     this.counts.nbOfRepliesRetrieved = this.counts.nbOfRepliesRetrieved || 0;
     this.counts.nbOfPlusonersRetrieved = this.counts.nbOfPlusonersRetrieved || 0;
@@ -272,8 +272,8 @@ function App_ (options) {
     });
 
     // Store the token in the database
-    updateHash['posts/session/nextPageToken'] = this.nextPageToken;
-    updateHash['posts/session/counts'] = this.counts;
+    updateHash['meta/session/nextPageToken'] = this.nextPageToken;
+    updateHash['meta/session/counts'] = this.counts;
     this.fb.updateData('', updateHash);
     if (Date.now() - this.startTime > 5 * 60 * 1000) throw new TimeElapsed('Ran out of time');
   };
@@ -304,7 +304,7 @@ function App_ (options) {
 
       this.inform.subject = 'Operation Complete';
       this.inform.body = "Enjoy";
-      this.fb.deleteData('posts/session');
+      this.fb.deleteData('meta/session');
       // TODO: Add trigger here? In which case it'll use the fast-foward method to pick up differences since last run
 
     } catch (err) {

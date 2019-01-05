@@ -38,9 +38,9 @@ let referenceToLastKey = undefined;
 
 
 function loadPosts() {
-
+    
     var sortMethod = document.getElementById("sortMethod").value;
-    var query = firebase.database().ref('/posts/').queryOrderedByValue(sortMethod);
+    var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
   
     if (referenceToLastValue) {
         // retrieve 1 additional posts + the last one previously retrieved: 11

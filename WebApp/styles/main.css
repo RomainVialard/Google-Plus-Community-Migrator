@@ -113,6 +113,7 @@ div.grid {
 }
 
 div.grid-item {
+    margin-bottom: 16px;
     box-sizing: border-box;
     break-inside: avoid;
 }
@@ -124,9 +125,6 @@ div.grid-item {
       margin: auto;
       width: 90%;
     }
-    div.grid-item {
-        margin: 8px;
-    }
 }
 
 /* 2 columns */
@@ -135,9 +133,6 @@ div.grid-item {
       column-count: 2;
       margin: auto;
       width: 90%;
-    }
-    div.grid-item {
-        margin: 8px;
     }
 }
 

@@ -7,15 +7,10 @@
       "version": "v1"
     }]
   },
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/plus.me",
-    "https://www.googleapis.com/auth/plus.profile.emails.read",
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/firebase.database",
-    "https://www.googleapis.com/auth/script.scriptapp",
-    "https://www.googleapis.com/auth/script.send_mail"
-  ],
-  "exceptionLogging": "STACKDRIVER"
+  "webapp": {
+    "access": "ANYONE",
+    "executeAs": "USER_ACCESSING"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "oauthScopes": ["https://www.googleapis.com/auth/plus.me", "https://www.googleapis.com/auth/plus.profile.emails.read", "https://www.googleapis.com/auth/script.external_request", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/firebase", "https://www.googleapis.com/auth/script.scriptapp", "https://www.googleapis.com/auth/script.send_mail"]
 }
-

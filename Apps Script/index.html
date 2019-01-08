@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Google+ Exporter</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <style>
+      .demo-ribbon {
+      width: 100%;
+      height: 40vh;
+      background-color: #DD6156;
+      flex-shrink: 0;
+      }
+      .demo-main {
+      margin-top: -35vh;
+      flex-shrink: 0;
+      }
+      .demo-header .mdl-layout__header-row {
+      padding-left: 40px;
+      }
+      .demo-container {
+      max-width: 1600px;
+      width: calc(100% - 16px);
+      margin: 0 auto;
+      }
+      .demo-content {
+      border-radius: 2px;
+      padding: 80px 56px;
+      margin-bottom: 80px;
+      }
+      .demo-layout.is-small-screen .demo-content {
+      padding: 40px 28px;
+      }
+      .demo-content h3 {
+      margin-top: 48px;
+      }
+      .mdl-button--accent.mdl-button--accent.mdl-button--raised {
+      background-color: #DD6156;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+      <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+        <div class="mdl-layout__header-row">
+          <span class="mdl-layout-title">Google+ Exporter</span>
+          <div class="mdl-layout-spacer"></div>
+        </div>
+      </header>
+      <div class="demo-ribbon"></div>
+      <main class="demo-main mdl-layout__content">
+        <div class="demo-container mdl-grid">
+          <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+          <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+            <div id="form">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="exportName" value="My G+ Export">
+                <label class="mdl-textfield__label" for="exportName">Export name</label>
+              </div>
+              <div style="display:block"></div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <? var searchQuery = "from:" + getGoogleId() + " NOT in:community" ?>
+                <input class="mdl-textfield__input" type="text" id="searchQuery" value="<?= searchQuery ?>" onchange="updateGooglePlusTestlink()">
+                <label class="mdl-textfield__label" for="searchQuery">G+ Search Query</label>
+                <? var searchQueryLink = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/posts?order=recent&scope=all" ?>
+              </div>
+              <a id="googlePlusTestlink" href="<?= searchQueryLink ?>" target="_blank" style="color:#DD6156">Test search query in G+</a>
+              
+              <div style="display:block"></div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <select class="mdl-textfield__input" id="firebaseProjectsList" name="firebaseProjectsList">
+                  <? var fbProjects = FirebaseApp.listProjects(); ?>
+                  <? for (var i = 0; i < fbProjects.length; i++) { ?>
+                  <option value="<?= fbProjects[i].projectId ?>"><?= fbProjects[i].displayName ?></option>
+                  <? } ?>
+                </select>
+                <label class="mdl-textfield__label" for="firebaseProjectsList">Firebase project:</label>
+              </div>
+              <div style="display:block"></div>
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="saveExportSettings(this)">
+              Export
+              </button>
+              <div id="progressBar" style="margin-top:15px; display:none" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+            </div>
+            <div id="confirmation" style="display:none">
+              <h3>Thank you!</h3>
+              The Google+ posts corresponding to your search query are being exported. You will receive an email notification once it's done.<br>
+              In the meantime, you can <a id="glitchUrlEl" href="https://glitch.com/edit/#!/remix/g-plus-community-migrator" target="_blank">use Glitch</a>
+              to deploy the web app and view those posts.
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script>
+      function saveExportSettings(el) {
+        document.getElementById("firebaseProjectsList").disabled = true;
+        el.disabled = true;
+        document.getElementById("progressBar").style.display = "block";
+        google.script.run.withSuccessHandler(displayConfirmationMessage).saveSettings({
+          exportName: document.getElementById("exportName").value,
+          searchQuery: document.getElementById("searchQuery").value,
+          firebaseProject: document.getElementById("firebaseProjectsList").value
+        });
+      }
+      
+      function displayConfirmationMessage() {
+        document.getElementById("form").style.display = "none";
+        document.getElementById("confirmation").style.display = "block";
+        
+        var glitchRemixUrl = "https://glitch.com/edit/#!/remix/g-plus-community-migrator?FIREBASE_PROJECT_ID=";
+        glitchRemixUrl+= document.getElementById("firebaseProjectsList").value;
+        document.getElementById("glitchUrlEl").setAttribute("href", glitchRemixUrl);
+      }
+      
+      function updateGooglePlusTestlink() {
+        var searchQuery = document.getElementById("searchQuery").value;
+        var searchQueryLink = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/posts?order=recent&scope=all";
+        document.getElementById("googlePlusTestlink").setAttribute("href", searchQueryLink);
+      }
+    </script>
+  </body>
+</html>

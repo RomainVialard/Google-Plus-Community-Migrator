@@ -15,8 +15,9 @@ function getAllPosts() {
   var lockAcquired = lock.tryLock(100);
   if (!lockAcquired) return;
   
-  var scriptProperties = PropertiesService.getScriptProperties();
-  
+  var userProperties = PropertiesService.getUserProperties();
+  var properties = userProperties.getProperties();
+    
   // Retrieving all the posts you want (eg: all posts from a specific community) might take quite a long time
   // Best to create a time-driven trigger to split the work between multiple script executions
   // Note that Google enforces a limit of 10K calls per day to the G+ API, after that you will start seeing the error:
@@ -27,26 +28,27 @@ function getAllPosts() {
     ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
     console.log("Trigger created");
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
-    scriptProperties.setProperty("lastSyncDate", today);
+    userProperties.setProperty("lastSyncDate", today);
     // Save export name in Firebase
     renameExport();
   }
   
-  var properties = scriptProperties.getProperties();
   var nextPageToken = properties["nextPageToken"] || null;
   var nbOfPostsRetrieved = properties["nbOfPostsRetrieved"] || 0;
   var lastSyncDate = properties["lastSyncDate"] || today;
   var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
+  var searchQuery = properties["searchQuery"] || SEARCH_QUERY;
+  var fbDatabaseUrl = properties["fbDatabaseUrl"] || FIREBASE_DB_URL;
   if (onlySyncNewPosts) {
     // full export done, simply retrieve the latest posts
-    SEARCH_QUERY+= " after:" + lastSyncDate;
+    searchQuery+= " after:" + lastSyncDate;
   }
   
   var token = ScriptApp.getOAuthToken();
-  var fb = FirebaseApp.getDatabaseByUrl(FIREBASE_DB_URL, token);
+  var fb = FirebaseApp.getDatabaseByUrl(fbDatabaseUrl, token);
   
   do {
-    var activityFeed = Plus.Activities.search(SEARCH_QUERY, {maxResults: 20, pageToken: nextPageToken});
+    var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
     var posts = activityFeed.items;
     nextPageToken = activityFeed.nextPageToken;
     if (!posts.length) nextPageToken = null;
@@ -114,7 +116,7 @@ function getAllPosts() {
     fb.updateData('', postData);
     
     ErrorHandler.expBackoff(function(){
-      scriptProperties.setProperties({
+      userProperties.setProperties({
         'nextPageToken': nextPageToken,
         'nbOfPostsRetrieved': nbOfPostsRetrieved
       });
@@ -122,46 +124,57 @@ function getAllPosts() {
     
     console.log(nbOfPostsRetrieved + " posts retrieved so far");
   
-    // stop if script run for more than 4 min (next trigger will process next batch)
+    // stop if script run for more than 5 min (next trigger will process next batch)
     // or if there's no more posts to retrieve (nextPageToken is null)
-  } while (Date.now() - startTime < 4 * 60 * 1000 && nextPageToken);
+  } while (Date.now() - startTime < 5 * 60 * 1000 && nextPageToken);
   
   if (!nextPageToken) {
     if (!onlySyncNewPosts) {
       // Once the full export is done, keep syncing but only retrieve new posts
-      scriptProperties.setProperty("onlySyncNewPosts", true);
+      userProperties.setProperty("onlySyncNewPosts", true);
       
       // Also send an email notification
       var posts = fb.getData("posts", {shallow: "true"});
       var nbOfPosts = Object.keys(posts).length;
       var currentUserEmailAddress = Session.getEffectiveUser();
       var subject = "Google+ exporter to Firebase - migration completed!";
-      var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + SEARCH_QUERY + "'<br>";
-      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(SEARCH_QUERY) + "/top";
+      var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + searchQuery + "'<br>";
+      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/posts?order=recent&scope=all";
       body+= linkToSearchResultsInGooglePlus+ "<br><br>";
       body+= "If you have completed the tutorial, all those posts should be available here:<br>";
-      body+= FIREBASE_DB_URL.replace("firebaseio.com", "firebaseapp.com");
+      body+= fbDatabaseUrl.replace("firebaseio.com", "firebaseapp.com");
       body+= "<br><br>New posts will also be automatically exported every day.";
       MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
     }
     else {
       // update lastSyncDate
-      scriptProperties.setProperty("lastSyncDate", today);
+      userProperties.setProperty("lastSyncDate", today);
     }
   }
 }
 
 // Change the name of the export, displayed in the web app header
-function renameExport() {
+function renameExport(fbDatabaseUrl, exportName) {
   var token = ScriptApp.getOAuthToken();
-  var fb = FirebaseApp.getDatabaseByUrl(FIREBASE_DB_URL, token);
-  fb.setData('siteTitle', EXPORT_NAME);
+  var fb = FirebaseApp.getDatabaseByUrl(fbDatabaseUrl || FIREBASE_DB_URL, token);
+  fb.setData('siteTitle', exportName || EXPORT_NAME);
 }
 
 // throw in the Apps Script editor UI the total number of posts recorded in Firebase
+// useful to check how many posts have been exported
 function listNbOfPostsStoredInFirebase() {
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(FIREBASE_DB_URL, token);
   var posts = fb.getData('posts', {shallow: true});
   throw "Currently " + Object.keys(posts).length + " posts stored in Firebase.";
+}
+
+// throw in the Apps Script editor UI the date of the oldest post retrieved in Firebase
+// useful to check if all posts, even the oldest ones have been exported
+function getOldestPostStoredInFirebase() {
+  var token = ScriptApp.getOAuthToken();
+  var fb = FirebaseApp.getDatabaseByUrl(FIREBASE_DB_URL, token);
+  var oldestPost = fb.getData('posts', {orderBy:"published", limitToFirst: 1});
+  Logger.log(oldestPost);
+  throw "The oldest post retrieved was published on " + oldestPost[Object.keys(oldestPost)[0]].published;
 }

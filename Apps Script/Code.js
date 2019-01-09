@@ -46,13 +46,12 @@ function getAllPosts() {
   
   var token = ScriptApp.getOAuthToken();
   var fb = FirebaseApp.getDatabaseByUrl(fbDatabaseUrl, token);
+  var postData = {};
   
   do {
     var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
     var posts = activityFeed.items;
     nextPageToken = activityFeed.nextPageToken;
-    if (!posts.length) nextPageToken = null;
-    var postData = {};
 
     for (var i in posts) {
       nbOfPostsRetrieved++;
@@ -112,8 +111,8 @@ function getAllPosts() {
       }
       */
     }
-    // Firebase multi-location updates - write up to 20 posts in 1 call, along with comments and plusoners
-    fb.updateData('', postData);
+    if (!posts.length) nextPageToken = null;
+    else console.log(nbOfPostsRetrieved + " posts retrieved so far");
     
     ErrorHandler.expBackoff(function(){
       userProperties.setProperties({
@@ -121,12 +120,18 @@ function getAllPosts() {
         'nbOfPostsRetrieved': nbOfPostsRetrieved
       });
     });
-    
-    console.log(nbOfPostsRetrieved + " posts retrieved so far");
-  
+      
     // stop if script run for more than 5 min (next trigger will process next batch)
     // or if there's no more posts to retrieve (nextPageToken is null)
   } while (Date.now() - startTime < 5 * 60 * 1000 && nextPageToken);
+  
+  if (!Object.keys(postData).length) {
+    if (onlySyncNewPosts) console.log("No new posts to retrieve");
+  }
+  else {
+    // Firebase multi-location updates - write all posts retrieved in 1 call, along with comments and plusoners
+    fb.updateData('', postData);
+  }
   
   if (!nextPageToken) {
     if (!onlySyncNewPosts) {
@@ -145,6 +150,7 @@ function getAllPosts() {
       body+= fbDatabaseUrl.replace("firebaseio.com", "firebaseapp.com");
       body+= "<br><br>New posts will also be automatically exported every day.";
       MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
+      console.log("Migration completed with " + nbOfPosts + " posts retrieved.");
     }
     else {
       // update lastSyncDate

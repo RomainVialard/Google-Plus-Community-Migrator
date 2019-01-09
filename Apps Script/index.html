@@ -117,6 +117,9 @@
         var glitchRemixUrl = "https://glitch.com/edit/#!/remix/g-plus-community-migrator?FIREBASE_PROJECT_ID=";
         glitchRemixUrl+= document.getElementById("firebaseProjectsList").value;
         document.getElementById("glitchUrlEl").setAttribute("href", glitchRemixUrl);
+        
+        // start migration
+        google.script.run.getAllPosts();
       }
       
       function updateGooglePlusTestlink() {

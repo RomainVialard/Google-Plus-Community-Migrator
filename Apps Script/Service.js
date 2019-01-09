@@ -23,10 +23,15 @@ function saveSettings(settings) {
   console.log("Starting a new export: " + JSON.stringify(settings));
   
   var triggers = ScriptApp.getProjectTriggers();
-  if (!triggers.length) {
-    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
-    console.log("Trigger created");
+  for (var i in triggers) {
+    ErrorHandler.expBackoff(function(){
+      ScriptApp.deleteTrigger(triggers[i]);
+    });
   }
+  ErrorHandler.expBackoff(function(){
+    ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
+  });
+  console.log("Trigger created");
   
   // Save export name in Firebase
   renameExport(fbDatabaseUrl, settings.exportName);

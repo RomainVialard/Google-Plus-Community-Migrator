@@ -73,12 +73,16 @@
               
               <div style="display:block"></div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <? var fbProjects = FirebaseApp.listProjects(); ?>
+                <? if (fbProjects.length) { ?>
                 <select class="mdl-textfield__input" id="firebaseProjectsList" name="firebaseProjectsList">
-                  <? var fbProjects = FirebaseApp.listProjects(); ?>
                   <? for (var i = 0; i < fbProjects.length; i++) { ?>
                   <option value="<?= fbProjects[i].projectId ?>"><?= fbProjects[i].displayName ?></option>
                   <? } ?>
                 </select>
+                <? } else { ?>
+                <input class="mdl-textfield__input" type="text" id="firebaseProjectsList">
+                <? } ?>
                 <label class="mdl-textfield__label" for="firebaseProjectsList">Firebase project:</label>
               </div>
               <div style="display:block"></div>

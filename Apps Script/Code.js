@@ -10,7 +10,7 @@ function getAllPosts() {
   var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   var startTime = Date.now();
   
-  var lock = LockService.getScriptLock();
+  var lock = LockService.getUserLock();
   // wait for 100ms only. If one instance of the script is already executing, abort.
   var lockAcquired = lock.tryLock(100);
   if (!lockAcquired) return;

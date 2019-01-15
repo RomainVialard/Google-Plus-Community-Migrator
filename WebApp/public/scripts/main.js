@@ -52,6 +52,12 @@ function isUserSignedIn() {
 let referenceToLastValue = '';
 let referenceToLastKey = undefined;
 
+/**
+ * Load posts from Firebase
+ * By default posts are retrieved by batch of 10 and sorted by publication date
+ * User can also order posts by nb of plusoners, replies or resharers
+ * Or perform a full-text search on the database (via a Firebase function)
+ */
 function loadPosts() {
   // Display a message to the user using a Toast.
   var data = {
@@ -87,7 +93,12 @@ function loadPosts() {
       }
     }
   };
-  var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
+  // check if search is activated
+  var searchQueryKey = searchFieldElement.dataset.newsearchQueryKey;
+  if (searchQueryKey) {
+    var query = firebase.database().ref('/searchResults/' + searchQueryKey).orderByChild(sortMethod);
+  }
+  else var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
   if (referenceToLastValue) {
     // retrieve 10 additional posts + the last one previously retrieved: 11
     query = query.limitToLast(11).endAt(referenceToLastValue, referenceToLastKey);
@@ -97,8 +108,9 @@ function loadPosts() {
   referenceToLastKey = undefined;
 }
 
-// remove all existing posts when user performs a search / sort
-// then reload them from Firebase
+/**
+ * Removes all existing posts when user performs a search / sort then reload them from Firebase
+ */
 function reloadPosts() {
   var postList = document.getElementById("posts");
   while (postList.lastChild.tagName != "TEMPLATE") {
@@ -246,6 +258,7 @@ var userNameElement = document.getElementById('user-name');
 var signInButtonElement = document.getElementById('sign-in');
 var signOutButtonElement = document.getElementById('sign-out');
 var snackbarElement = document.getElementById('snackbar');
+var searchFieldElement = document.getElementById('searchField');
 
 signOutButtonElement.addEventListener('click', signOut);
 signInButtonElement.addEventListener('click', signIn);
@@ -371,4 +384,37 @@ function togglePlusoned(el) {
       }
     });
   }
+}
+
+// call a Firebase function to perform search on server side
+function triggerSearch() {
+  var searchQuery = searchFieldElement.value;
+  searchFieldElement.disabled = true;
+  document.getElementById('searchButton').style.display = 'none';
+  document.getElementById('searchSpinner').style.display = 'inline-block';
+
+  if (!searchQuery) {
+    var newsearchQueryKey = '';
+  }
+  else {
+    var searchQueriesListRef = firebase.database().ref('searchQueries');
+    var newsearchQueryKey = searchQueriesListRef.push({
+      query: searchQuery,
+      startedAt: firebase.database.ServerValue.TIMESTAMP
+    }).key;
+  }
+  searchFieldElement.dataset.newsearchQueryKey = newsearchQueryKey;
+  searchQueriesListRef.child(newsearchQueryKey + '/nbOfResults').on('value', function(dataSnapshot) {
+    if (dataSnapshot.val() != null) {
+      var data = {
+        message: dataSnapshot.val() + ' posts matching your search query have been found.',
+        timeout: 1500
+      };
+      snackbarElement.MaterialSnackbar.showSnackbar(data);
+      searchFieldElement.disabled = false;
+      document.getElementById('searchButton').style.display = 'inline-block';
+      document.getElementById('searchSpinner').style.display = 'none';
+    }
+  });
+  reloadPosts();
 }

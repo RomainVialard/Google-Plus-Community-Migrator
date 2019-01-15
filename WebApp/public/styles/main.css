@@ -30,11 +30,7 @@ main {
   max-width: 1024px;
   margin: auto;
 }
-.material-icons {
-  font-size: 36px;
-  top: 8px;
-  position: relative;
-}
+
 .mdl-layout__header-row {
   padding: 0;
   margin: 0 auto;
@@ -98,7 +94,4 @@ main {
     background-size: 33px;
   }
 }
-.mdl-button .material-icons {
-  top: -1px;
-  margin-right: 5px;
-}
+

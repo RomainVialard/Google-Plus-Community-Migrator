@@ -1,5 +1,6 @@
 {
   "projects": {
-    "prod": "apps-script-community-archive"
+    "prod": "apps-script-community-archive",
+    "default": "apps-script-community-archive"
   }
 }

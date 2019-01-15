@@ -70,7 +70,7 @@
 
     <div id="posts-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
 
-      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="margin-right:10px">
         <select class="mdl-textfield__input" id="sortMethod" name="sortMethod" onChange="reloadPosts()">
           <option value="published" selected>By publication date</option>
           <option value="object/replies/totalItems">By number of comments</option>
@@ -78,6 +78,17 @@
           <option value="object/resharers/totalItems">By number of resharers</option>
         </select>
         <label class="mdl-textfield__label" for="sortMethod">Sort</label>
+      </div>
+
+      <div>
+        <div class="mdl-textfield mdl-js-textfield">
+          <input class="mdl-textfield__input" type="text" id="searchField">
+          <label class="mdl-textfield__label" for="searchField">Search posts...</label>
+        </div>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" id="searchButton" onclick="triggerSearch()">
+          <i class="material-icons">search</i>
+        </button>
+        <div class="mdl-spinner mdl-js-spinner is-active" style="display:none" id="searchSpinner"></div>
       </div>
 
       <div id="posts">

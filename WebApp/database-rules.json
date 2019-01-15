@@ -1,9 +1,10 @@
 {
   "rules": {
-    ".read": true,
+    ".read": false,
     ".write": false,
 
     "posts": {
+      ".read": true,
       ".indexOn": ["published", "object/replies/totalItems", "object/plusoners/totalItems", "object/resharers/totalItems"],
 
       "$post_id": {
@@ -71,12 +72,14 @@
 
     "comments": {
       "$post_id": {
+        ".read": true,
         ".indexOn": ["published"]
       }
     },
 
     "plusoners": {
       "$post_id": { // The ID of an activity.
+        ".read": true,
         "$google_id": { // The Google ID of the person who +1'd this activity.
 
           ".write": "auth != null && auth.token.firebase.identities['google.com'][0] == $google_id",
@@ -89,6 +92,25 @@
           "kind": {},
           "url": {}
         }
+      }
+    },
+
+    "siteTitle": {
+      ".read": true
+    },
+
+    "searchQueries" : {
+      ".indexOn": ["startedAt"],
+      "$query_id": {
+        ".read": true,
+        ".write": true
+      }
+    },
+
+    "searchResults" : {
+      "$query_id": {
+        ".read": true,
+        ".indexOn": ["published", "object/replies/totalItems", "object/plusoners/totalItems", "object/resharers/totalItems"]
       }
     }
   }

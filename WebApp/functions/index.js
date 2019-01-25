@@ -39,7 +39,15 @@ exports.fullTextSearchOnDatabase = functions
       // check if post content matches our search query
       if (posts[i].object.content.search(searchQueryRegEx) !== -1) {
         // add the publication date + nb of plusoners to try to sort by relevance or recent activity
-        matchingResults[i] = posts[i];
+        matchingResults[i] = {};
+        matchingResults[i].published = posts[i].published;
+        matchingResults[i].object = {};
+        matchingResults[i].object.replies = {};
+        matchingResults[i].object.replies.totalItems = posts[i].object.replies.totalItems;
+        matchingResults[i].object.plusoners = {};
+        matchingResults[i].object.plusoners.totalItems = posts[i].object.plusoners.totalItems;
+        matchingResults[i].object.resharers = {};
+        matchingResults[i].object.resharers.totalItems = posts[i].object.resharers.totalItems;
       }
     }
 

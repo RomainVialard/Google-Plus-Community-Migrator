@@ -69,11 +69,21 @@ function loadPosts() {
   }
 
   var sortMethod = document.getElementById("sortMethod").value;
+  // check if search is activated
+  var searchQueryKey = searchFieldElement.dataset.newsearchQueryKey;
 
   var callback = function(snap) {
     var postId = snap.key;
     var postData = snap.val();
-    displayPost(postId, postData);
+    if (searchQueryKey) {
+      // search results only contain a subset of the post data, we need to retrieve the full post again
+      firebase.database().ref('/posts/' + postId).once('value', function (snap) {
+        displayPost(postId, snap.val());
+      });
+    }
+    else {
+      displayPost(postId, postData);
+    }
 
     if (!referenceToLastKey) {
       referenceToLastKey = postId;
@@ -93,8 +103,7 @@ function loadPosts() {
       }
     }
   };
-  // check if search is activated
-  var searchQueryKey = searchFieldElement.dataset.newsearchQueryKey;
+
   if (searchQueryKey) {
     var query = firebase.database().ref('/searchResults/' + searchQueryKey).orderByChild(sortMethod);
   }

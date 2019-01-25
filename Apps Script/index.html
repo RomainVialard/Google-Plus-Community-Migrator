@@ -62,7 +62,8 @@
                 <input class="mdl-textfield__input" type="text" id="exportName" value="My G+ Export">
                 <label class="mdl-textfield__label" for="exportName">Export name</label>
               </div>
-              <div style="display:block"></div>
+              
+              <div style="display:block; font-size: 0.7em; color:grey">Note: it seems only public content can be retrieved. So best is to try your search query from a private browsing / incognito session.</div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <? var searchQuery = "from:" + getGoogleId() + " NOT in:community" ?>
                 <input class="mdl-textfield__input" type="text" id="searchQuery" value="<?= searchQuery ?>" onchange="updateGooglePlusTestlink()">

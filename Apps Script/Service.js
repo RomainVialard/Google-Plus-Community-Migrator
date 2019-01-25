@@ -22,12 +22,7 @@ function saveSettings(settings) {
   
   console.log("Starting a new export: " + JSON.stringify(settings));
   
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i in triggers) {
-    ErrorHandler.expBackoff(function(){
-      ScriptApp.deleteTrigger(triggers[i]);
-    });
-  }
+  deleteExistingTriggers();
   ErrorHandler.expBackoff(function(){
     ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
   });
@@ -35,4 +30,13 @@ function saveSettings(settings) {
   
   // Save export name in Firebase
   renameExport(fbDatabaseUrl, settings.exportName);
+}
+
+function deleteExistingTriggers() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i in triggers) {
+    ErrorHandler.expBackoff(function(){
+      ScriptApp.deleteTrigger(triggers[i]);
+    });
+  }
 }

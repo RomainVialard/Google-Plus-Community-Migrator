@@ -12,8 +12,10 @@ function getAllPosts() {
   
   var lock = LockService.getUserLock();
   // wait for 100ms only. If one instance of the script is already executing, abort.
-  var lockAcquired = lock.tryLock(100);
-  if (!lockAcquired) return;
+  var lockAcquired = ErrorHandler.expBackoff(function(){
+    return lock.tryLock(100);
+  });
+  if (!lockAcquired || lockAcquired instanceof Error) return;
   
   var userProperties = PropertiesService.getUserProperties();
   var properties = userProperties.getProperties();
@@ -34,9 +36,9 @@ function getAllPosts() {
   }
   
   var nextPageToken = properties["nextPageToken"] || null;
-  var nbOfPostsRetrieved = properties["nbOfPostsRetrieved"] || 0;
   var lastSyncDate = properties["lastSyncDate"] || today;
   var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
+  var dateOfMostRecentUpdate = properties["dateOfMostRecentUpdate"] || null;
   var searchQuery = properties["searchQuery"] || SEARCH_QUERY;
   var fbDatabaseUrl = properties["fbDatabaseUrl"] || FIREBASE_DB_URL;
   if (onlySyncNewPosts) {
@@ -44,9 +46,8 @@ function getAllPosts() {
     searchQuery+= " after:" + lastSyncDate;
   }
   
-  var token = ScriptApp.getOAuthToken();
-  var fb = FirebaseApp.getDatabaseByUrl(fbDatabaseUrl, token);
   var postData = {};
+  var newDateOfMostRecentUpdate = null;
   
   do {
     var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
@@ -54,8 +55,12 @@ function getAllPosts() {
     nextPageToken = activityFeed.nextPageToken;
 
     for (var i in posts) {
-      nbOfPostsRetrieved++;
       var postId = posts[i].id;
+      var updated = new Date(posts[i].updated).getTime();
+      if (onlySyncNewPosts) {
+        // save the date of most recent update
+        if(!newDateOfMostRecentUpdate || newDateOfMostRecentUpdate < updated) newDateOfMostRecentUpdate = updated;
+      }
       postData["posts/" + postId] = posts[i];
 
       // retrieve comments
@@ -112,25 +117,52 @@ function getAllPosts() {
       */
     }
     if (!posts.length) nextPageToken = null;
-    else console.log(nbOfPostsRetrieved + " posts retrieved so far");
-    
-    ErrorHandler.expBackoff(function(){
-      userProperties.setProperties({
-        'nextPageToken': nextPageToken,
-        'nbOfPostsRetrieved': nbOfPostsRetrieved
-      });
-    });
-      
+        
     // stop if script run for more than 5 min (next trigger will process next batch)
     // or if there's no more posts to retrieve (nextPageToken is null)
   } while (Date.now() - startTime < 5 * 60 * 1000 && nextPageToken);
   
   if (!Object.keys(postData).length) {
-    if (onlySyncNewPosts) console.log("No new posts to retrieve");
+    if (onlySyncNewPosts) console.log("0 new posts today for Firebase project: " + properties['firebaseProject']);
+  }
+  else if (onlySyncNewPosts && dateOfMostRecentUpdate && dateOfMostRecentUpdate == newDateOfMostRecentUpdate) {
+    console.log("Today's posts have already been imported for Firebase project: " + properties['firebaseProject']);
   }
   else {
     // Firebase multi-location updates - write all posts retrieved in 1 call, along with comments and plusoners
-    fb.updateData('', postData);
+    try {
+      var token = ScriptApp.getOAuthToken();
+      var fb = FirebaseApp.getDatabaseByUrl(fbDatabaseUrl, token);
+      fb.updateData('', postData);
+    }
+    catch(e) {
+      ErrorHandler.logError(e);
+      if (e.message === "404 - Firebase error. Please ensure that you spelled the name of your Firebase correctly") {
+        // delete trigger and warn user it's not possible to continue
+        deleteExistingTriggers();
+        var currentUserEmailAddress = Session.getEffectiveUser();
+        var subject = "Google+ exporter to Firebase - migration issue";
+        var body = "We can't find your Firebase project. Maybe you didn't spell the name of your Firebase correctly.<br>";
+        body+= "Please try again to set up your export from this web app:";
+        body+= "https://script.google.com/macros/s/AKfycbwzj4xPRnd5vylHvI84lLSYgwi1QImFdzQhqGm1xLzD4g2EQK8/exec";
+        MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
+      }
+      return;
+    }
+    
+    ErrorHandler.expBackoff(function(){
+      userProperties.setProperties({
+        'nextPageToken': nextPageToken,
+        'dateOfMostRecentUpdate': newDateOfMostRecentUpdate
+      });
+    });
+    
+    // Get the nb of posts in database
+    var posts = fb.getData("posts", {shallow: "true"});
+    if (posts) var nbOfPosts = Object.keys(posts).length;
+    // if no posts retrieved, it might be because of a wrong G+ query
+    else var nbOfPosts = 0;
+    console.log(nbOfPosts + " posts in Firebase: " + properties['firebaseProject']);       
   }
   
   if (!nextPageToken) {
@@ -139,12 +171,11 @@ function getAllPosts() {
       userProperties.setProperty("onlySyncNewPosts", true);
       
       // Also send an email notification
-      var posts = fb.getData("posts", {shallow: "true"});
-      var nbOfPosts = Object.keys(posts).length;
       var currentUserEmailAddress = Session.getEffectiveUser();
       var subject = "Google+ exporter to Firebase - migration completed!";
       var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + searchQuery + "'<br>";
-      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery) + "/posts?order=recent&scope=all";
+      var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery);
+      linkToSearchResultsInGooglePlus+= "/posts?order=recent&scope=all";
       body+= linkToSearchResultsInGooglePlus+ "<br><br>";
       body+= "If you have completed the tutorial, all those posts should be available here:<br>";
       body+= fbDatabaseUrl.replace("firebaseio.com", "firebaseapp.com");

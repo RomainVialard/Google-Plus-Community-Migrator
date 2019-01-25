@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "firebase-tools": "^6.2.2"
+    "firebase-tools": "6.3.0"
   },
   "scripts": {
     "start": "firebase help"

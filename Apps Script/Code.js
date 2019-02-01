@@ -50,7 +50,11 @@ function getAllPosts() {
   var newDateOfMostRecentUpdate = null;
   
   do {
-    var activityFeed = Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
+    var activityFeed = ErrorHandler.expBackoff(function(){
+      return Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
+    });
+    if (activityFeed && activityFeed instanceof Error) return;
+    
     var posts = activityFeed.items;
     nextPageToken = activityFeed.nextPageToken;
 

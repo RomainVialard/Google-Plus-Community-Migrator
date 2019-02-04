@@ -109,7 +109,7 @@
       "$query_id": {
         ".read": true,
         ".write": true,
-        ".validate": "newData.isBoolean()"
+        ".validate": "newData.isNumber()"
       }
     },
 

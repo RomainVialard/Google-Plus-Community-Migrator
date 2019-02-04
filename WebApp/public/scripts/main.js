@@ -341,7 +341,7 @@ document.getElementsByTagName('main')[0].addEventListener('scroll', function(eve
 
 // check if Functions have been deployed - if so, display searchbar
 var functionsDeployedRef = firebase.database().ref("functionsDeployed");
-functionsDeployedRef.set(false).then(function() {
+functionsDeployedRef.set(Date.now()).then(function() {
   functionsDeployedRef.on('value', function(snapshot) {
     if (snapshot.val() === null) {
       document.getElementById("searchBar").style.display = "block";

@@ -112,6 +112,6 @@ exports.deleteOldItems = functions.database.ref('/searchQueries/{pushId}').onCre
 /**
  * Inform client side that functions have been deployed and thus it's possible to use the search bar
  */
-exports.confirmFunctionsDeployed = functions.database.ref('/functionsDeployed').onUpdate((snapshot) => {
-  return snapshot.ref.remove();
+exports.confirmFunctionsDeployed = functions.database.ref('/functionsDeployed').onUpdate((change) => {
+  return change.after.ref.remove();
 });

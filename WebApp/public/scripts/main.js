@@ -192,10 +192,48 @@ function displayPost(postId, postData) {
   var messageElement = div.querySelector('.jVjeQd');
   messageElement.innerHTML = postData.object.content;
 
-  // Check if an image is linked to the post
-  if (postData.object.attachments && postData.object.attachments['0'] && postData.object.attachments['0'].image) {
+  // Check if post contains an attachment (photo or article)
+  if (postData.object.attachments && postData.object.attachments['0']) {
     div.querySelector('div[data-jsname="MTOxpb"]').style.display = "block";
-    div.querySelector('.JZUAbb').src = postData.object.attachments['0'].image.url;
+
+    var attachment = postData.object.attachments['0'];
+    if (attachment.objectType === "photo") {
+      var attachmentDiv = div.querySelector('.e8zLFb');
+      attachmentDiv.style.display = "block";
+      var imgAttachmentEl = attachmentDiv.querySelector('.JZUAbb');
+      imgAttachmentEl.src = attachment.image.url;
+      imgAttachmentEl.height = attachment.fullImage.height;
+      imgAttachmentEl.width = attachment.fullImage.width;
+      imgAttachmentEl.alt = attachment.displayName;
+
+      imgAttachmentEl.onload = function(){
+        attachmentDiv.querySelector('.E68jgf').style.paddingTop = (imgAttachmentEl.clientHeight / imgAttachmentEl.clientWidth * 100) + "%";
+      }
+    }
+    else if (attachment.objectType === "article") {
+      var attachmentDiv = div.querySelector('div[data-jsname="attachmentTypeArticle"]');
+      attachmentDiv.style.display = "block";
+
+      attachmentDiv.querySelectorAll('.NHphBb').forEach(function(el) {
+        el.href = attachment.url;
+        });
+
+
+      attachmentDiv.querySelector('.Tuxepf').innerText = attachment.displayName;
+      if (attachment.image) {
+        var imgAttachmentEl = attachmentDiv.querySelector('.JZUAbb');
+        imgAttachmentEl.src = attachment.image.url;
+        imgAttachmentEl.height = attachment.image.height;
+        imgAttachmentEl.width = attachment.image.width;
+        imgAttachmentEl.alt = attachment.displayName;
+
+        imgAttachmentEl.onload = function(){
+          attachmentDiv.querySelector('.E68jgf').style.paddingTop = (imgAttachmentEl.clientHeight / imgAttachmentEl.clientWidth * 100) + "%";
+        }
+      }
+
+      attachmentDiv.querySelector('.g0644c').innerText = attachment.url.split('/')[2];
+    }
   }
 
   // LIKES / PLUSONES
@@ -307,6 +345,7 @@ function expandPost(el) {
 }
 
 function displayAllComments(el) {
+  el.onclick = '';
   el.querySelector('.EMg45').style.display = 'none';
   var fullCommentListParentEl = el.querySelector('.RIrM6d');
   var postId = fullCommentListParentEl.parentNode.parentNode.parentNode.parentNode.parentNode.id;

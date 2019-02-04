@@ -328,15 +328,26 @@ firebase.database().ref("siteTitle").once('value').then(function(snapshot) {
 let referenceToOldestPost = '';
 let nbOfPostsDisplayed = 0;
 
-// load the first 10 posts right away
+// load the first 10 posts right away...
 loadPosts();
-// load 10 more posts once user scrolled to the bottom of the page
+// ...and load 10 more posts once user scrolled to the bottom of the page
 document.getElementsByTagName('main')[0].addEventListener('scroll', function(event) {
   var element = event.target;
   if (Math.round(element.scrollHeight - element.scrollTop) === Math.round(element.clientHeight)) {
     referenceToOldestPost = '';
     loadPosts();
   }
+});
+
+// check if Functions have been deployed - if so, display searchbar
+var functionsDeployedRef = firebase.database().ref("functionsDeployed");
+functionsDeployedRef.set(false).then(function() {
+  functionsDeployedRef.on('value', function(snapshot) {
+    if (snapshot.val() === null) {
+      document.getElementById("searchBar").style.display = "block";
+      functionsDeployedRef.off();
+    }
+  });
 });
 
 function expandPost(el) {

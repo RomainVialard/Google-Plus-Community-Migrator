@@ -99,11 +99,17 @@
       ".read": true
     },
 
+    "functionsDeployed": {
+      ".read": true,
+      ".write": true
+    },
+
     "searchQueries" : {
       ".indexOn": ["startedAt"],
       "$query_id": {
         ".read": true,
-        ".write": true
+        ".write": true,
+        ".validate": "newData.isBoolean()"
       }
     },
 

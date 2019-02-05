@@ -201,7 +201,7 @@ function displayPost(postId, postData) {
       var attachmentDiv = div.querySelector('.e8zLFb');
       attachmentDiv.style.display = "block";
       var imgAttachmentEl = attachmentDiv.querySelector('.JZUAbb');
-      imgAttachmentEl.src = attachment.image.url;
+      imgAttachmentEl.src = attachment.image.firebaseUrl || attachment.image.url;
       imgAttachmentEl.height = attachment.fullImage.height;
       imgAttachmentEl.width = attachment.fullImage.width;
       imgAttachmentEl.alt = attachment.displayName;
@@ -222,7 +222,7 @@ function displayPost(postId, postData) {
       attachmentDiv.querySelector('.Tuxepf').innerText = attachment.displayName;
       if (attachment.image) {
         var imgAttachmentEl = attachmentDiv.querySelector('.JZUAbb');
-        imgAttachmentEl.src = attachment.image.url;
+        imgAttachmentEl.src = attachment.image.firebaseUrl || attachment.image.url;
         imgAttachmentEl.height = attachment.image.height;
         imgAttachmentEl.width = attachment.image.width;
         imgAttachmentEl.alt = attachment.displayName;

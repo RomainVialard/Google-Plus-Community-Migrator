@@ -111,7 +111,16 @@ exports.deleteOldItems = functions.database.ref('/searchQueries/{pushId}').onCre
 
 /**
  * Inform client side that functions have been deployed and thus it's possible to use the search bar
+ * Use both onCreate() and onUpdate() event handlers (as onUpdate() doesn't fire on when new data is created)
+ * Client side will write data under the 'functionsDeployed' path. If data is then deleted by the Function
+ * it means Functions have been deployed and we can display the search bar (which need Functions to work)
+ *
+ * Note: Using onCreate() is not enough as client side can write data under the 'functionsDeployed' path
+ * before Functions are deployed. For that case, we also need the onUpdate() trigger.
  */
-exports.confirmFunctionsDeployed = functions.database.ref('/functionsDeployed').onUpdate((change) => {
+exports.confirmFunctionsDeployedOnCreate = functions.database.ref('/functionsDeployed').onCreate((snapshot) => {
+  return snapshot.ref.remove();
+});
+exports.confirmFunctionsDeployedOnUpdate = functions.database.ref('/functionsDeployed').onUpdate((change) => {
   return change.after.ref.remove();
 });

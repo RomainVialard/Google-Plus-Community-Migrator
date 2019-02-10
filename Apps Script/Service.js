@@ -16,6 +16,7 @@ function saveSettings(settings) {
     searchQuery: settings.searchQuery,
     exportName: settings.exportName,
     fbDatabaseUrl: fbDatabaseUrl,
+    saveImages: true,
     // Save when we started the backup, this will be useful to keep syncing new posts once the whole content has been retrieved
     lastSyncDate: today
   }, true);
@@ -26,15 +27,19 @@ function saveSettings(settings) {
   ErrorHandler.expBackoff(function(){
     ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(5).create();
   });
-  console.log("Trigger created");
+  ErrorHandler.expBackoff(function(){
+    ScriptApp.newTrigger("exportImages").timeBased().everyMinutes(1).create();
+  });
+  console.log("Triggers created");
   
   // Save export name in Firebase
   renameExport(fbDatabaseUrl, settings.exportName);
 }
 
-function deleteExistingTriggers() {
+function deleteExistingTriggers(functionName) {
   var triggers = ScriptApp.getProjectTriggers();
   for (var i in triggers) {
+    if (functionName && triggers[i].getHandlerFunction() != functionName) continue;
     ErrorHandler.expBackoff(function(){
       ScriptApp.deleteTrigger(triggers[i]);
     });

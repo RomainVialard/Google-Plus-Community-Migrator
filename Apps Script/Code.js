@@ -6,6 +6,8 @@ var SEARCH_QUERY = "community:" + COMMUNITY_ID;
 // https://support.google.com/plus/answer/1669519
 // but "from:me" is not working, you need your Google+ profile ID, eg: "from:116263732197316259248 NOT in:community"
 
+var RUN_TIME_LIMIT = 5 * 60 * 1000;
+
 function getAllPosts() {
   var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
   var startTime = Date.now();
@@ -37,10 +39,12 @@ function getAllPosts() {
   
   var nextPageToken = properties["nextPageToken"] || null;
   var lastSyncDate = properties["lastSyncDate"] || today;
-  var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
   var dateOfMostRecentUpdate = properties["dateOfMostRecentUpdate"] || null;
   var searchQuery = properties["searchQuery"] || SEARCH_QUERY;
   var fbDatabaseUrl = properties["fbDatabaseUrl"] || FIREBASE_DB_URL;
+  var firebaseProject = properties["firebaseProject"] || null;
+  var saveImages = properties["saveImages"] || false;
+  var onlySyncNewPosts = properties["onlySyncNewPosts"] || false;
   if (onlySyncNewPosts) {
     // full export done, simply retrieve the latest posts
     searchQuery+= " after:" + lastSyncDate;
@@ -48,25 +52,45 @@ function getAllPosts() {
   
   var postData = {};
   var newDateOfMostRecentUpdate = null;
+  var timeLimitReached = false;
   
   do {
     var activityFeed = ErrorHandler.expBackoff(function(){
       return Plus.Activities.search(searchQuery, {maxResults: 20, pageToken: nextPageToken});
     });
-    if (activityFeed && activityFeed instanceof Error) return;
+    if (activityFeed && activityFeed instanceof Error) {
+      if (nextPageToken) break;
+      else return;
+    }
     
     var posts = activityFeed.items;
-    nextPageToken = activityFeed.nextPageToken;
-
+    
     for (var i in posts) {
+      if (Date.now() - startTime > RUN_TIME_LIMIT) {
+        timeLimitReached = true;
+        break;
+      }
+      
       var postId = posts[i].id;
+      
       var updated = new Date(posts[i].updated).getTime();
       if (onlySyncNewPosts) {
         // save the date of most recent update
         if(!newDateOfMostRecentUpdate || newDateOfMostRecentUpdate < updated) newDateOfMostRecentUpdate = updated;
       }
+      
+      // Check if post has an image as attachment
+      // if so, tag it for export to Firebase Storage
+      // (best to export images via different execution to avoid uncatchable error: "Exceeded memory limit") 
+      if (saveImages && posts[i].object && posts[i].object.attachments 
+          && posts[i].object.attachments[0].image 
+          && posts[i].object.attachments[0].image.url) {
+        var imageUrl = posts[i].object.attachments[0].image.url;
+        postData["imagesToExport/" + postId] = imageUrl;       
+      }
+      
       postData["posts/" + postId] = posts[i];
-
+      
       // retrieve comments
       var comments = ErrorHandler.expBackoff(function(){
         return Plus.Comments.list(postId, {maxResults: 500}).items;
@@ -120,11 +144,12 @@ function getAllPosts() {
       }
       */
     }
+    if (!timeLimitReached) nextPageToken = activityFeed.nextPageToken;
     if (!posts.length) nextPageToken = null;
         
     // stop if script run for more than 5 min (next trigger will process next batch)
     // or if there's no more posts to retrieve (nextPageToken is null)
-  } while (Date.now() - startTime < 5 * 60 * 1000 && nextPageToken);
+  } while (Date.now() - startTime < RUN_TIME_LIMIT && !timeLimitReached && nextPageToken);
   
   if (!Object.keys(postData).length) {
     if (onlySyncNewPosts) console.log("0 new posts today for Firebase project: " + properties['firebaseProject']);
@@ -176,16 +201,22 @@ function getAllPosts() {
       
       // Also send an email notification
       var currentUserEmailAddress = Session.getEffectiveUser();
-      var subject = "Google+ exporter to Firebase - migration completed!";
+      var subject = "Google+ exporter to Firebase - all posts exported!";
       var body = nbOfPosts + " posts have been exported, matching the following G+ search query: '" + searchQuery + "'<br>";
       var linkToSearchResultsInGooglePlus = "https://plus.google.com/s/" + encodeURIComponent(searchQuery);
       linkToSearchResultsInGooglePlus+= "/posts?order=recent&scope=all";
       body+= linkToSearchResultsInGooglePlus+ "<br><br>";
+      body+= "Note that images are still being exported, you will receive a new email notification once done.<br><br>";
       body+= "If you have completed the tutorial, all those posts should be available here:<br>";
       body+= fbDatabaseUrl.replace("firebaseio.com", "firebaseapp.com");
       body+= "<br><br>New posts will also be automatically exported every day.";
       MailApp.sendEmail(currentUserEmailAddress, subject, body, {htmlBody: body});
       console.log("Migration completed with " + nbOfPosts + " posts retrieved.");
+      
+      deleteExistingTriggers("getAllPosts");
+      ErrorHandler.expBackoff(function(){
+        ScriptApp.newTrigger("getAllPosts").timeBased().everyMinutes(30).create();
+      });
     }
     else {
       // update lastSyncDate

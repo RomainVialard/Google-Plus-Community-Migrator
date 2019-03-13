@@ -33,26 +33,47 @@ function isUserSignedIn() {
     return !!firebase.auth().currentUser;
 }
 
+let pageSize = 20;
 let referenceToLastValue = '';
 let referenceToLastKey = undefined;
 
-
 function loadPosts() {
+  
+    page++;
+    
+    if(typeof(msnry) === 'undefined' || isNaN(msnry.cols)) {
+        msnry = new Masonry('.grid', {
+            itemSelector: '.grid-item',
+            columnWidth: '.grid-sizer',
+            percentPosition: true,
+            horizontalOrder: true,
+            transitionDuration: 0,
+            gutter: 8
+        });
+    }
+    
+    if(msnry.colYs.length === 0) {
+      console.warn("msnry.colYs.length === 0");
+    }
 
     var sortMethod = document.getElementById("sortMethod").value;
     var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
   
     if (referenceToLastValue) {
         // retrieve 1 additional posts + the last one previously retrieved: 11
-        query = query.limitToLast(11).endAt(referenceToLastValue, referenceToLastKey);
+        query = query.limitToLast(pageSize + 1).endAt(referenceToLastValue, referenceToLastKey);
     } else {
-        query = query.limitToLast(10);
+        query = query.limitToLast(pageSize);
     }
   
     query.on('child_added', function(snapshot) {
+        
         var postId = snapshot.key;
         var postData = snapshot.val();
-        displayPost(postId, postData);
+        
+        var div = displayPost(postId, postData);
+        msnry.prepended(div);
+        
         if (! referenceToLastKey) {
             referenceToLastKey = postId;
             switch(sortMethod) {
@@ -72,6 +93,9 @@ function loadPosts() {
         }
   });
   referenceToLastKey = undefined;
+  if(page === 1) {
+    setTimeout(function() {msnry.layout();}, 800);
+  }
 }
 
 // remove all posts when user performs a search / sort; then reload them from Firebase.
@@ -81,16 +105,13 @@ function reloadPosts() {
     var postList = document.getElementById("posts");
     var items = postList.getElementsByClassName("grid-item");
     
-    /* remove the items from DOM */
+    /* also remove the items from DOM */
     while (postList.lastChild !== null) {
         postList.removeChild(postList.lastChild);
+        msnry.remove(postList.lastChild);
     }
     
-    referenceToLastKey = '';
-    referenceToLastValue = '';
-    referenceToOldestPost = '';
-    nbOfPostsDisplayed = 0;
-
+    clearLayout();
     loadPosts();
 }
 
@@ -129,28 +150,34 @@ function displayPost(postId, postData) {
     
   var div = document.getElementById(postId);
   
-  // if a post was already retrieved and displayed, skip it.
+  // if post was already retrieved and displayed, skip
   if (div) {
       
-      /* TODO: comment avatars & plusones would nevertheless need to be updated */
+      /* todo: comment avatars & plusones would need to be updated */
       return false;
   }
 
   var template = document.getElementById("template-holder").querySelector("template");
   var copy = document.importNode(template.content, true);
+  
   div = copy.querySelector('div');
-  div.id = postId;
-
-  if (!referenceToOldestPost) {postListElement.appendChild(div);}
-  else {postListElement.insertBefore(div, referenceToOldestPost);}
+  div.id = "post_" + postId;
+  
+  if (!referenceToOldestPost) {
+      // postListElement.appendChild(div);
+  } else {
+      // postListElement.insertBefore(div, referenceToOldestPost);
+  }
+  // msnry.appended(div);
+  
   referenceToOldestPost = div;
   nbOfPostsDisplayed++;
-
+  
   div.querySelector('.MqU2J').src = postData.actor.image.url;
   div.querySelector('.sXku1c').textContent = postData.actor.displayName;
 
   var publicationDate = moment(postData.published);
-  div.querySelector('.o8gkze').textContent = publicationDate.fromNow();
+  div.querySelector('.o8gkze').textContent = publicationDate.fromNow() + " ("+ nbOfPostsDisplayed+")";
 
   // check if the access.description field contains a community category
   var regExp = /\(([^)]+)\)/;
@@ -221,10 +248,33 @@ function displayPost(postId, postData) {
         commentSection.appendChild(div);
         div.querySelector('.vGowKb').textContent = comment.actor.displayName;
         div.querySelector('.Wj5EM').querySelector('span').innerHTML = comment.object.content;
+        msnry.layout();
       }
     });
   }
+  
+  // console.log("index "+index+": "+postId + " > " + publicationDate.fromNow());
+  var index = (page*pageSize) + (nbOfPostsDisplayed-1 -(page*pageSize));
+  posts[index] = div;
+  if(nbOfPostsDisplayed % pageSize === 0) {
+      var j=0; 
+      var rev = posts.slice(nbOfPostsDisplayed-pageSize, nbOfPostsDisplayed).reverse();
+      for(var i=posts.length-pageSize; i < posts.length; i++) {
+        if(typeof(rev[j]) !== 'undefined') {
+          var div = rev[j];
+          postListElement.appendChild(div);
+          msnry.appended(div);
+        }
+        j++;
+      }
+      console.log("loaded page " + page + "; " + nbOfPostsDisplayed + " items.");
+      // msnry.layout();
+  }
 }
+
+var msnry, posts;
+var posts = [];
+var page = 0;
 
 // Shortcuts to DOM Elements.
 var postListElement = document.getElementById('posts');
@@ -249,6 +299,8 @@ firebase.database().ref("siteTitle").once('value').then(function(snapshot) {
     document.querySelector('meta[name="application-name"]').setAttribute("content", siteTitle);
     document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute("content", siteTitle);
     document.getElementsByTagName('h3')[0].innerText = siteTitle;
+  } else {
+      console.log("Firebase: the siteTitle is not defined.");
   }
 });
 
@@ -270,6 +322,7 @@ document.getElementsByTagName('main')[0].addEventListener('scroll', function(eve
 function expandPost(el) {
   el.classList.remove("qhIQqf");
   el.querySelector('.jVjeQd').style['max-height'] = 'none';
+  msnry.layout();
 }
 
 function displayAllComments(el) {
@@ -286,15 +339,19 @@ function displayAllComments(el) {
   var query = firebase.database().ref(path).orderByChild('published');
   query.on('child_added', function (snapshot) {
     if(snapshot.val()) {
+      
       var comment = snapshot.val();
       var copy = document.importNode(commentTemplate.content, true);
       var li = copy.querySelector('li');
+      
       commentSection.appendChild(li);
       li.querySelector('.vGowKb').textContent = comment.actor.displayName;
       li.querySelector('.MqU2J').src = comment.actor.image.url;
       li.querySelector('.g6UaYd').querySelector('div').innerHTML = comment.object.content;
       var publicationDate = moment(comment.published);
       li.querySelector('.gmFStc').querySelector('span').textContent = publicationDate.fromNow();
+      
+      msnry.layout();
     }
   });
 }
@@ -316,6 +373,7 @@ function togglePlusoned(el) {
 
   var subEl = el.querySelector('[aria-label="+1"]');
   if (el.dataset.pressed === "true") {
+      
     el.dataset.pressed = false;
     el.dataset.count--;
 
@@ -331,11 +389,12 @@ function togglePlusoned(el) {
         el.parentNode.querySelector('.M8ZOee').textContent = el.dataset.count;
       }
     });
-  }
-  else {
+    
+  } else {
+    
     el.dataset.pressed = true;
     el.dataset.count++;
-
+    
     // Firebase: write the new +1's data simultaneously in the post's plusoners list and the post data.
     var updates = {};
     updates['/posts/' + postId + "/object/plusoners/totalItems"] = +el.dataset.count;
@@ -343,7 +402,9 @@ function togglePlusoned(el) {
       displayName: firebase.auth().currentUser.displayName,
       // etag: "",
       id: userGoogleId,
-      image: {url: firebase.auth().currentUser.photoURL},
+      image: {
+        url: firebase.auth().currentUser.photoURL
+      },
       kind: "plus#person",
       url: "https://profiles.google.com/" + userGoogleId
     };
@@ -357,4 +418,26 @@ function togglePlusoned(el) {
       }
     });
   }
+}
+
+function clearLayout() {
+  
+  referenceToLastKey = '';
+  referenceToLastValue = '';
+  referenceToOldestPost = '';
+  nbOfPostsDisplayed = 0;
+  
+  /* visually remove the items from the layout */
+  var postList = document.getElementById("posts");
+  var items = postList.getElementsByClassName("grid-item");
+  msnry.remove(items);
+  
+  /* also remove the items from DOM */
+  while (postList.lastChild !== null) {
+    postList.removeChild(postList.lastChild);
+  }
+  
+  msnry._resetLayout();
+  posts = [];
+  page = 0;
 }

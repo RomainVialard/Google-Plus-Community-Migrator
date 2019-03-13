@@ -1,0 +1,74 @@
+div#template-holder {
+    display: none;
+}
+
+div#sort_method {
+    margin-left: 8px;
+    width: 200px;
+}
+
+.mdl-textfield__input {
+    cursor: pointer;
+}
+
+.mdl-textfield__input > option {
+    
+}
+
+div#sort_method > label {
+    
+}
+
+div.grid {
+    max-width: 1600px;
+}
+
+div.grid-item {
+    box-sizing: border-box;
+    break-inside: avoid;
+    height: fit-content;
+}
+
+/* 3 columns */
+@media screen and (min-width: 1400px) {
+    div.grid {
+      margin: auto;
+      width: 90%;
+    }
+    div.grid-sizer, div.grid-item {
+        margin: 8px;
+        width: 32%;
+    }
+    div.grid-item {
+        margin-bottom: 8px;
+    }
+}
+
+/* 2 columns */
+@media screen and (min-width: 840px) and (max-width: 1400px) {
+    div.grid {
+      margin: auto;
+      width: 90%;
+    }
+    div.grid-sizer, div.grid-item {
+        width: 45%;
+    }
+    div.grid-item {
+       margin-bottom: 8px;
+    }
+}
+
+/* 1 column, the default value */
+@media screen and (max-width: 840px) {
+    div.grid {
+      width: 100%;
+      margin: 0;
+    }
+    div.grid-sizer, div.grid-item {
+        width: 100%;
+    }
+    div.grid-item {
+        margin-bottom: 8px;
+        border-radius: 0;
+    }
+}

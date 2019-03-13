@@ -65,6 +65,7 @@ main {
   padding-right: 10px;
   padding-left: 20px;
 }
+
 .message img {
   max-width: 300px;
   max-height: 200px;
@@ -92,68 +93,4 @@ main {
 .mdl-button .material-icons {
   top: -1px;
   margin-right: 5px;
-}
-
-div#template-holder {
-    display: none;
-}
-
-div#sort_method {
-    margin-left: 8px;
-    width: 220px;
-}
-
-div#sort_method > label {
-    text-align: right;
-}
-
-div.grid {
-    max-width: 1600px;
-    column-gap: 8px;
-}
-
-div.grid-item {
-    box-sizing: border-box;
-    break-inside: avoid;
-}
-
-/* 3 columns */
-@media screen and (min-width: 1400px) {
-    div.grid {
-      column-count: 3;
-      margin: auto;
-      width: 90%;
-    }
-    div.grid-item {
-        margin: 8px;
-    }
-}
-
-/* 2 columns */
-@media screen and (min-width: 840px) and (max-width: 1400px) {
-    div.grid {
-      column-count: 2;
-      margin: auto;
-      width: 90%;
-    }
-    div.grid-item {
-        margin: 8px;
-    }
-}
-
-/* 1 column, the default value */
-@media screen and (max-width: 840px) {
-    div.grid {
-      column-count: 1;
-      width: 100%;
-      margin: 0;
-    }
-    div.grid-item {
-        width: 100%;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        margin-left: 0px;
-        margin-right: 0px;
-        border-radius: 0;
-    }
 }

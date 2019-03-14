@@ -38,9 +38,7 @@ let referenceToLastValue = '';
 let referenceToLastKey = undefined;
 
 function loadPosts() {
-  
     page++;
-    
     if(typeof(msnry) === 'undefined' || isNaN(msnry.cols)) {
         msnry = new Masonry('.grid', {
             itemSelector: '.grid-item',
@@ -55,7 +53,6 @@ function loadPosts() {
     if(msnry.colYs.length === 0) {
       console.warn("msnry.colYs.length === 0");
     }
-
     var sortMethod = document.getElementById("sortMethod").value;
     var query = firebase.database().ref('/posts/').orderByChild(sortMethod);
   
@@ -441,3 +438,4 @@ function clearLayout() {
   posts = [];
   page = 0;
 }
+
